@@ -1,0 +1,9 @@
+entity.contact_message.forms:
+  title: 'Forms'
+  route_name: contact.form_list
+  base_route: contact.form_list
+
+entity.contact_message.list:
+  title: 'List'
+  route_name: entity.contact_message.list
+  base_route: contact.form_list

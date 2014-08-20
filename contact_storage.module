@@ -41,4 +41,14 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   $keys['id'] = 'id';
   $entity_types['contact_message']->set('entity_keys', $keys);
   $entity_types['contact_message']->set('base_table', 'contact_message');
+  // Add edit and delete forms.
+  $entity_types['contact_message']->setFormClass('edit', '\Drupal\contact_storage\MessageEditForm');
+  $entity_types['contact_message']->setFormClass('delete', '\Drupal\contact_storage\Form\MessageDeleteForm');
+  // Allow edit/delete links in list builder.
+  $entity_types['contact_message']->setLinkTemplate('edit-form', 'entity.contact_message.edit_form');
+  $entity_types['contact_message']->setLinkTemplate('delete-form', 'entity.contact_message.delete_form');
+  // Fallback when no views available.
+  $entity_types['contact_message']->setListBuilderClass('\Drupal\contact_storage\MessageListBuilder');
+  // @todo Replace with access control handler when not enough.
+  $entity_types['contact_message']->set('admin_permission', 'administer contact forms');
 }
