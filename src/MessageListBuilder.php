@@ -62,7 +62,7 @@ class MessageListBuilder extends EntityListBuilder {
    */
   public function load() {
     $result = $this->queryFactory->get($this->entityTypeId)
-      ->pager(1)
+      ->pager(20)
       ->execute();
     return $this->storage->loadMultiple($result);
   }
