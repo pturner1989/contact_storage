@@ -36,7 +36,7 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   // Set the controller class for nodes to an alternate implementation of the
   // Drupal\Core\Entity\EntityStorageInterface interface.
-  $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\ContentEntityDatabaseStorage');
+  $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\Sql\SqlContentEntityStorage');
   $keys = $entity_types['contact_message']->getKeys();
   $keys['id'] = 'id';
   $entity_types['contact_message']->set('entity_keys', $keys);
