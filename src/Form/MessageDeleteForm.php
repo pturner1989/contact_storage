@@ -9,7 +9,6 @@ namespace Drupal\contact_storage\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Provides a deletion confirmation form for contact message entity.
@@ -34,7 +33,7 @@ class MessageDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.contact_message.list');
+    return $this->getEntity()->urlInfo('collection');
   }
 
   /**
@@ -47,7 +46,7 @@ class MessageDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message($this->t('Deleted contact message %subject.', array('%subject' => $this->entity->getSubject())));
     $this->logger('contact_storage')->notice('Deleted contact message %subject.', array('%subject' => $this->entity->getSubject()));

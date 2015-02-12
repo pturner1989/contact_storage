@@ -14,7 +14,7 @@ entity.contact_message.delete_form:
   requirements:
     _permission: 'administer contact forms'
 
-entity.contact_message.list:
+entity.contact_message.collection:
   path: '/admin/structure/contact/messages'
   defaults:
     _entity_list: 'contact_message'

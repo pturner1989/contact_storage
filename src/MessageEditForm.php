@@ -7,11 +7,9 @@
 
 namespace Drupal\contact_storage;
 
-use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -54,19 +52,9 @@ class MessageEditForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    $user = $this->currentUser();
     /** @var \Drupal\contact\MessageInterface $message */
     $message = $this->entity;
     $form = parent::form($form, $form_state, $message);
-
-    $language_configuration = $this->moduleHandler->invoke('language', 'get_default_configuration', array('contact_message', $message->getContactForm()->id()));
-    $form['langcode'] = array(
-      '#title' => $this->t('Language'),
-      '#type' => 'language_select',
-      '#default_value' => $message->getUntranslated()->language()->getId(),
-      '#languages' => LanguageInterface::STATE_ALL,
-      '#access' => isset($language_configuration['language_show']) && $language_configuration['language_show'],
-    );
 
     $form['name'] = array(
       '#type' => 'textfield',
@@ -90,7 +78,7 @@ class MessageEditForm extends ContentEntityForm {
     $this->entity->save();
     $this->logger('contact')->notice('The contact message %subject has been updated.', array(
       '%subject' => $this->entity->getSubject(),
-      'link' => $this->l($this->t('Edit'), 'entity.contact_message.edit_form', array('contact_message' => $this->entity->id())),
+      'link' => $this->getEntity()->link($this->t('Edit'), 'edit-form'),
     ));
   }
 

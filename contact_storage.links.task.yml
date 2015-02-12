@@ -3,7 +3,7 @@ entity.contact_message.forms:
   route_name: entity.contact_form.collection
   base_route: entity.contact_form.collection
 
-entity.contact_message.list:
+entity.contact_message.collection:
   title: 'List'
-  route_name: entity.contact_message.list
+  route_name: entity.contact_message.collection
   base_route: entity.contact_form.collection
