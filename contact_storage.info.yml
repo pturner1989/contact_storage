@@ -6,4 +6,5 @@ core: 8.x
 dependencies:
   - contact
   - user
+  - views
 configure: entity.contact_message.collection

@@ -7,7 +7,6 @@
 
 namespace Drupal\contact_storage\Tests;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -28,7 +27,7 @@ class ContactStorageTest extends WebTestBase {
     'field_ui',
     'contact_storage_test',
     'contact_test',
-    'contact_storage'
+    'contact_storage',
   );
 
   /**
@@ -64,6 +63,10 @@ class ContactStorageTest extends WebTestBase {
     $rows = $this->xpath('//tbody/tr');
     // Make sure only 1 message is available.
     $this->assertEqual(count($rows), 1);
+    // Some fields should be present.
+    $this->assertText('Test_subject');
+    $this->assertText('Test_name');
+    $this->assertText('test_label');
 
     // Make sure the stored message is correct.
     $this->clickLink(t('Edit'));
@@ -71,9 +74,11 @@ class ContactStorageTest extends WebTestBase {
     $this->assertFieldById('edit-mail', $mail);
     $this->assertFieldById('edit-subject-0-value', 'Test_subject');
     $this->assertFieldById('edit-message-0-value', 'Test_message');
+    // Submit should redirect back to listing.
+    $this->drupalPostForm(NULL, array(), t('Save'));
+    $this->assertUrl('admin/structure/contact/messages');
 
     // Delete the message.
-    $this->drupalGet('admin/structure/contact/messages');
     $this->clickLink(t('Delete'));
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $this->assertText('Deleted contact message Test_subject.');
