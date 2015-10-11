@@ -84,6 +84,17 @@ class ContactStorageTest extends WebTestBase {
     $this->assertText('Deleted contact message Test_subject.');
     // Make sure no messages are available.
     $this->assertText('There is no Contact message yet.');
+
+    // Fill the redirect field and assert the page is successfully redirected.
+    $edit = ['contact_storage_uri' => 'entity:user/' . $admin_user->id()];
+    $this->drupalPostForm('admin/structure/contact/manage/test_id', $edit, t('Save'));
+    $edit = [
+      'subject[0][value]' => 'Test subject',
+      'message[0][value]' => 'Test message',
+    ];
+    $this->drupalPostForm('contact', $edit, t('Send message'));
+    $this->assertText('Your message has been sent.');
+    $this->assertEqual($this->url, $admin_user->urlInfo()->setAbsolute()->toString());
   }
 
   /**
