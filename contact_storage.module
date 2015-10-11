@@ -48,8 +48,8 @@ function contact_storage_contact_message_redirect_submit(&$form, &$form_state) {
   /* @var \Drupal\contact\MessageInterface $contact_message */
   $contact_message = $form_state->getFormObject()->getEntity();
   $contact_form = ContactForm::load($contact_message->bundle());
-  if ($contact_form->getThirdPartySetting('contact_storage', 'redirect_uri', FALSE)) {
-    $form_state->setRedirectUrl(Url::fromUri($contact_form->getThirdPartySetting('contact_storage', 'redirect_uri', FALSE)));
+  if ($redirect_uri = $contact_form->getThirdPartySetting('contact_storage', 'redirect_uri', FALSE)) {
+    $form_state->setRedirectUrl(Url::fromUri($redirect_uri));
   }
 }
 
