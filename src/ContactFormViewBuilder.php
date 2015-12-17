@@ -7,6 +7,7 @@
 
 namespace Drupal\contact_storage;
 
+use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
@@ -41,11 +42,11 @@ class ContactFormViewBuilder implements EntityViewBuilderInterface, EntityHandle
   protected $renderer;
 
   /**
-   * The configuration factory.
+   * The contact settings config object.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\Config
    */
-  protected $configFactory;
+  protected $config;
 
   /**
    * The contact message storage.
@@ -61,15 +62,15 @@ class ContactFormViewBuilder implements EntityViewBuilderInterface, EntityHandle
    *   The entity form builder service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory service.
+   * @param \Drupal\Core\Config\Config $config
+   *   The contact settings config object.
    * @param \Drupal\Core\Entity\EntityStorageInterface $contact_message_storage
    *   The contact message storage.
    */
-  public function __construct(EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer, ConfigFactoryInterface $config_factory, EntityStorageInterface $contact_message_storage) {
+  public function __construct(EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer, Config $config, EntityStorageInterface $contact_message_storage) {
     $this->entityFormBuilder = $entity_form_builder;
     $this->renderer = $renderer;
-    $this->configFactory = $config_factory;
+    $this->config = $config;
     $this->contactMessageStorage = $contact_message_storage;
   }
 
@@ -80,7 +81,7 @@ class ContactFormViewBuilder implements EntityViewBuilderInterface, EntityHandle
     return new static(
       $container->get('entity.form_builder'),
       $container->get('renderer'),
-      $container->get('config.factory'),
+      $container->get('config.factory')->get('contact.settings'),
       $container->get('entity_type.manager')->getStorage('contact_message')
     );
   }
@@ -97,8 +98,7 @@ class ContactFormViewBuilder implements EntityViewBuilderInterface, EntityHandle
     $form['#title'] = $entity->label();
     $form['#cache']['contexts'][] = 'user.permissions';
 
-    $config = $this->configFactory->get('contact.settings');
-    $this->renderer->addCacheableDependency($form, $config);
+    $this->renderer->addCacheableDependency($form, $this->config);
 
     return $form;
   }
