@@ -79,7 +79,11 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Delete the message.
     $this->clickLink(t('Delete'));
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $this->assertText('Deleted contact message Test_subject.');
+    $this->assertRaw(t('The @entity-type %label has been deleted.', [
+      // See \Drupal\Core\Entity\EntityDeleteFormTrait::getDeletionMessage().
+      '@entity-type' => 'contact message',
+      '%label'       => 'Test_subject',
+    ]));
     // Make sure no messages are available.
     $this->assertText('There is no Contact message yet.');
 

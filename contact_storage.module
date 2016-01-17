@@ -91,11 +91,12 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\Sql\SqlContentEntityStorage');
   $keys = $entity_types['contact_message']->getKeys();
   $keys['id'] = 'id';
+  $keys['label'] = 'subject';
   $entity_types['contact_message']->set('entity_keys', $keys);
   $entity_types['contact_message']->set('base_table', 'contact_message');
   // Add edit and delete forms.
   $entity_types['contact_message']->setFormClass('edit', '\Drupal\contact_storage\MessageEditForm');
-  $entity_types['contact_message']->setFormClass('delete', '\Drupal\contact_storage\Form\MessageDeleteForm');
+  $entity_types['contact_message']->setFormClass('delete', '\Drupal\Core\Entity\ContentEntityDeleteForm');
   // Allow edit/delete links in list builder.
   $entity_types['contact_message']->setLinkTemplate('collection', '/admin/structure/contact/messages');
   $entity_types['contact_message']->setLinkTemplate('edit-form', '/admin/structure/contact/messages/{contact_message}');
