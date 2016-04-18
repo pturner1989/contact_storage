@@ -5,6 +5,8 @@
  * Contains main module logic.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\contact\ContactFormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -56,7 +58,7 @@ function contact_storage_contact_message_redirect_submit(&$form, &$form_state) {
 /**
  * Implements hook_entity_base_field_info().
  */
-function contact_storage_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function contact_storage_entity_base_field_info(EntityTypeInterface $entity_type) {
   if ($entity_type->id() == 'contact_message') {
     $fields = array();
     $fields['id'] = BaseFieldDefinition::create('integer')
@@ -82,6 +84,34 @@ function contact_storage_entity_base_field_info(\Drupal\Core\Entity\EntityTypeIn
 
 
 /**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function contact_storage_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'contact_message') {
+    // Start at min 3 because message default weight is 0.
+    $i = -3;
+    foreach (array('name', 'mail', 'subject') as $field_name) {
+      $fields[$field_name]->setDisplayConfigurable('view', TRUE);
+      $fields[$field_name]->setDisplayOptions('view', array('weight' => $i));
+      $i++;
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function contact_storage_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'contact_message' && $entity->access('view')) {
+    $operations['view'] = array(
+      'title' => t('View'),
+      'weight' => 0,
+      'url' => $entity->urlInfo('canonical'),
+    );
+  }
+}
+
+/**
  * Implements hook_entity_type_alter().
  */
 function contact_storage_entity_type_alter(array &$entity_types) {
@@ -99,7 +129,8 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   $entity_types['contact_message']->setFormClass('delete', '\Drupal\Core\Entity\ContentEntityDeleteForm');
   // Allow edit/delete links in list builder.
   $entity_types['contact_message']->setLinkTemplate('collection', '/admin/structure/contact/messages');
-  $entity_types['contact_message']->setLinkTemplate('edit-form', '/admin/structure/contact/messages/{contact_message}');
+  $entity_types['contact_message']->setLinkTemplate('canonical', '/admin/structure/contact/messages/{contact_message}');
+  $entity_types['contact_message']->setLinkTemplate('edit-form', '/admin/structure/contact/messages/{contact_message}/edit');
   $entity_types['contact_message']->setLinkTemplate('delete-form', '/admin/structure/contact/messages/{contact_message}/delete');
   // @todo Replace with access control handler when not enough.
   $entity_types['contact_message']->set('admin_permission', 'administer contact forms');

@@ -39,6 +39,7 @@ class ContactStorageTest extends ContactStorageTestBase {
       'administer users',
       'administer account settings',
       'administer contact_message fields',
+      'administer contact_message display',
     ));
     $this->drupalLogin($admin_user);
     // Create first valid contact form.
@@ -55,8 +56,22 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->submitContact('Test_name', $mail, 'Test_subject', 'test_id', 'Test_message');
     $this->assertText(t('Your message has been sent.'));
 
-    // Login as admin,check the message list overview.
+    // Login as admin.
     $this->drupalLogin($admin_user);
+
+    $display_fields = array(
+      "The sender's name",
+      "The sender's email",
+      "Subject"
+    );
+
+    // Check that name, subject and mail are configurable on display.
+    $this->drupalGet('admin/structure/contact/manage/test_id/display');
+    foreach ($display_fields as $label) {
+      $this->assertText($label);
+    }
+
+    // Check the message list overview.
     $this->drupalGet('admin/structure/contact/messages');
     $rows = $this->xpath('//tbody/tr');
     // Make sure only 1 message is available.
@@ -66,7 +81,15 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('Test_name');
     $this->assertText('test_label');
 
+    // Click the view link and make sure name, subject and email are displayed
+    // by default.
+    $this->clickLink(t('View'));
+      foreach ($display_fields as $label) {
+        $this->assertText($label);
+      }
+
     // Make sure the stored message is correct.
+    $this->drupalGet('admin/structure/contact/messages');
     $this->clickLink(t('Edit'));
     $this->assertFieldById('edit-name', 'Test_name');
     $this->assertFieldById('edit-mail', $mail);
