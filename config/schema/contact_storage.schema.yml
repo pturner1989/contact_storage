@@ -5,3 +5,6 @@ contact.form.*.third_party.contact_storage:
     redirect_uri:
       type: string
       label: 'Redirect URI'
+    submit_text:
+      type: string
+      label: 'Submit Text'

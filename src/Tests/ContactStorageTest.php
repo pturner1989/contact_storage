@@ -96,9 +96,8 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertFieldById('edit-subject-0-value', 'Test_subject');
     $this->assertFieldById('edit-message-0-value', 'Test_message');
     // Submit should redirect back to listing.
-    $this->drupalPostForm(NULL, array(), t('Save'));
-    $this->assertUrl('admin/structure/contact/messages');
-
+    $this->drupalPostForm('admin/structure/contact/messages', array(), $headers = array(), $form_html_id =NULL, t('Save'));
+    $this->assertUrl('admin/structure/contact/messages',[]);
     // Delete the message.
     $this->clickLink(t('Delete'));
     $this->drupalPostForm(NULL, NULL, t('Delete'));
@@ -120,6 +119,16 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalPostForm('contact', $edit, t('Send message'));
     $this->assertText('Your message has been sent.');
     $this->assertEqual($this->url, $admin_user->urlInfo()->setAbsolute()->toString());
+
+    // Fill the "Submit button text" field and assert the form can still be submitted.
+    $edit = ['contact_storage_submit_text' => 'Submit the form'];
+    $this->drupalPostForm('admin/structure/contact/manage/test_id', $edit, t('Save'));
+    $edit = [
+      'subject[0][value]' => 'Test subject',
+      'message[0][value]' => 'Test message',
+    ];
+    $this->drupalPostForm('contact', $edit, t('Submit the form'));
+    $this->assertText('Your message has been sent.');
   }
 
 }
