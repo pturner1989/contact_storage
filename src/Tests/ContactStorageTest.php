@@ -84,9 +84,9 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Click the view link and make sure name, subject and email are displayed
     // by default.
     $this->clickLink(t('View'));
-      foreach ($display_fields as $label) {
-        $this->assertText($label);
-      }
+    foreach ($display_fields as $label) {
+      $this->assertText($label);
+    }
 
     // Make sure the stored message is correct.
     $this->drupalGet('admin/structure/contact/messages');
@@ -96,8 +96,9 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertFieldById('edit-subject-0-value', 'Test_subject');
     $this->assertFieldById('edit-message-0-value', 'Test_message');
     // Submit should redirect back to listing.
-    $this->drupalPostForm('admin/structure/contact/messages', array(), $headers = array(), $form_html_id =NULL, t('Save'));
-    $this->assertUrl('admin/structure/contact/messages',[]);
+    $this->drupalPostForm(NULL, array(), t('Save'));
+    $this->assertUrl('admin/structure/contact/messages');
+
     // Delete the message.
     $this->clickLink(t('Delete'));
     $this->drupalPostForm(NULL, NULL, t('Delete'));
@@ -120,14 +121,22 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('Your message has been sent.');
     $this->assertEqual($this->url, $admin_user->urlInfo()->setAbsolute()->toString());
 
-    // Fill the "Submit button text" field and assert the form can still be submitted.
-    $edit = ['contact_storage_submit_text' => 'Submit the form'];
+    // Fill the "Submit button text" field and assert the form can still be
+    // submitted.
+    $edit = [
+      'contact_storage_submit_text' => 'Submit the form',
+      'contact_storage_preview' => FALSE,
+    ];
     $this->drupalPostForm('admin/structure/contact/manage/test_id', $edit, t('Save'));
     $edit = [
       'subject[0][value]' => 'Test subject',
       'message[0][value]' => 'Test message',
     ];
-    $this->drupalPostForm('contact', $edit, t('Submit the form'));
+    $this->drupalGet('contact');
+    $element = $this->cssSelect('#edit-preview');
+    // Preview button is hidden.
+    $this->assertTrue(empty($element));
+    $this->drupalPostForm(NULL, $edit, t('Submit the form'));
     $this->assertText('Your message has been sent.');
   }
 

@@ -8,3 +8,6 @@ contact.form.*.third_party.contact_storage:
     submit_text:
       type: string
       label: 'Submit Text'
+    show_preview:
+      type: boolean
+      label: 'Show preview button'
