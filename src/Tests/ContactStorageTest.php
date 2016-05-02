@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\contact_storage\Tests;
+use Drupal\field_ui\Tests\FieldUiTestTrait;
 
 /**
  * Tests storing contact messages and viewing them through UI.
@@ -14,6 +15,8 @@ namespace Drupal\contact_storage\Tests;
  */
 class ContactStorageTest extends ContactStorageTestBase {
 
+  use FieldUiTestTrait;
+
   /**
    * Modules to enable.
    *
@@ -21,6 +24,7 @@ class ContactStorageTest extends ContactStorageTestBase {
    */
   public static $modules = array(
     'text',
+    'block',
     'contact',
     'field_ui',
     'contact_storage_test',
@@ -32,6 +36,9 @@ class ContactStorageTest extends ContactStorageTestBase {
    * Tests contact messages submitted through contact form.
    */
   public function testContactStorage() {
+    $this->drupalPlaceBlock('system_breadcrumb_block');
+    $this->drupalPlaceBlock('local_actions_block');
+    $this->drupalPlaceBlock('page_title_block');
     // Create and login administrative user.
     $admin_user = $this->drupalCreateUser(array(
       'access site-wide contact form',
@@ -138,6 +145,20 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertTrue(empty($element));
     $this->drupalPostForm(NULL, $edit, t('Submit the form'));
     $this->assertText('Your message has been sent.');
+
+    // Test clone functionality - add field to existing form.
+    $this->fieldUIAddNewField('admin/structure/contact/manage/test_id', 'text_field', 'Text field', 'text');
+    // Then clone it.
+    $this->drupalGet('admin/structure/contact/manage/test_id/clone');
+    $this->drupalPostForm(NULL, [
+      'id' => 'test_id_2',
+      'label' => 'Cloned',
+    ], t('Clone'));
+
+    // The added field should be on the cloned form too.
+    $edit['field_text_field[0][value]'] = 'Some text';
+    $this->drupalGet('contact/test_id_2');
+    $this->drupalPostForm(NULL, $edit, t('Submit the form'));
   }
 
 }
