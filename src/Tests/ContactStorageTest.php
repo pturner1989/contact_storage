@@ -47,6 +47,7 @@ class ContactStorageTest extends ContactStorageTestBase {
       'administer users',
       'administer account settings',
       'administer contact_message fields',
+      'administer contact_message form display',
       'administer contact_message display',
     ));
     $this->drupalLogin($admin_user);
