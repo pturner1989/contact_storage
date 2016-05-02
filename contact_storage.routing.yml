@@ -22,6 +22,14 @@ entity.contact_message.delete_form:
   requirements:
     _permission: 'administer contact forms'
 
+entity.contact_form.clone_form:
+  path: '/admin/structure/contact/manage/{contact_form}/clone'
+  defaults:
+    _entity_form: 'contact_form.clone'
+    _title: 'Clone form'
+  requirements:
+    _permission: 'administer contact forms'
+
 entity.contact_message.collection:
   path: '/admin/structure/contact/messages'
   defaults:

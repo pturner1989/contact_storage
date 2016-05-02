@@ -19,7 +19,13 @@ use Drupal\contact\Entity\ContactForm;
  */
 function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface $form_state) {
   /** @var \Drupal\contact\ContactFormInterface $contact_form */
-  $contact_form = $form_state->getFormObject()->getEntity();
+
+  $form_object = $form_state->getFormObject();
+  if (!in_array($form_object->getOperation(), ['edit', 'add'], TRUE)) {
+    // Only alter the edit and add forms.
+    return;
+  }
+  $contact_form = $form_object->getEntity();
   $form['contact_storage_uri'] = [
     '#type' => 'textfield',
     '#title' => t('Redirect Page'),
@@ -139,6 +145,13 @@ function contact_storage_entity_operation_alter(array &$operations, EntityInterf
       'url' => $entity->urlInfo('canonical'),
     );
   }
+  if ($entity->getEntityTypeId() == 'contact_form' && $entity->access('update')) {
+    $operations['clone'] = array(
+      'title' => t('Clone'),
+      'weight' => 10,
+      'url' => $entity->urlInfo('clone-form'),
+    );
+  }
 }
 
 /**
@@ -157,11 +170,15 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   // Add edit and delete forms.
   $entity_types['contact_message']->setFormClass('edit', '\Drupal\contact_storage\MessageEditForm');
   $entity_types['contact_message']->setFormClass('delete', '\Drupal\Core\Entity\ContentEntityDeleteForm');
+  // Add clone form for messages.
+  $entity_types['contact_form']->setFormClass('clone', '\Drupal\contact_storage\Form\ContactFormCloneForm');
   // Allow edit/delete links in list builder.
   $entity_types['contact_message']->setLinkTemplate('collection', '/admin/structure/contact/messages');
   $entity_types['contact_message']->setLinkTemplate('canonical', '/admin/structure/contact/messages/{contact_message}');
   $entity_types['contact_message']->setLinkTemplate('edit-form', '/admin/structure/contact/messages/{contact_message}/edit');
   $entity_types['contact_message']->setLinkTemplate('delete-form', '/admin/structure/contact/messages/{contact_message}/delete');
+  // Add clone link for forms.
+  $entity_types['contact_form']->setLinkTemplate('clone-form', '/admin/structure/contact/manage/{contact_form}/clone');
   // @todo Replace with access control handler when not enough.
   $entity_types['contact_message']->set('admin_permission', 'administer contact forms');
   // Integrate with Views.
