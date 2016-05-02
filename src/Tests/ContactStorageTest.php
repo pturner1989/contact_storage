@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\contact_storage\Tests;
+use Drupal\contact\Entity\ContactForm;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
 
 /**
@@ -159,6 +160,8 @@ class ContactStorageTest extends ContactStorageTestBase {
     $edit['field_text_field[0][value]'] = 'Some text';
     $this->drupalGet('contact/test_id_2');
     $this->drupalPostForm(NULL, $edit, t('Submit the form'));
+    $form = ContactForm::load('test_id_2');
+    $this->assertTrue($form->uuid());
   }
 
 }

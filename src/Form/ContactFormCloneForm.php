@@ -89,11 +89,11 @@ class ContactFormCloneForm extends ContactFormEditForm {
     $contact_form = $this->entity;
     // Get the original ID.
     $original_id = $contact_form->getOriginalId();
+    $new_id = $contact_form->id();
 
     // Create the new form.
-    $contact_form->enforceIsNew(TRUE);
-    $contact_form->setOriginalId($contact_form->id());
-    $contact_form->set('uuid', NULL);
+    $contact_form = $contact_form->createDuplicate();
+    $contact_form->set('id', $new_id);
     $contact_form->save();
 
     // Clone configurable fields.
@@ -104,9 +104,9 @@ class ContactFormCloneForm extends ContactFormEditForm {
       if ($this->moduleHandler->moduleExists('field')) {
         if ($config = $field->getConfig($original_id)) {
           $new_config = FieldConfig::create([
-              'bundle' => $contact_form->id(),
-              'uuid' => NULL,
-            ] + $config->toArray());
+            'bundle' => $contact_form->id(),
+            'uuid' => NULL,
+          ] + $config->toArray());
           $new_config->save();
         }
       }
