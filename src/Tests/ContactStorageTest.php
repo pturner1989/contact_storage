@@ -79,6 +79,10 @@ class ContactStorageTest extends ContactStorageTestBase {
       $this->assertText($label);
     }
 
+    // Check that preview is configurable on form display.
+    $this->drupalGet('admin/structure/contact/manage/test_id/form-display');
+    $this->assertText('Preview');
+
     // Check the message list overview.
     $this->drupalGet('admin/structure/contact/messages');
     $rows = $this->xpath('//tbody/tr');
