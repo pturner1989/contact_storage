@@ -179,6 +179,13 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   $entity_types['contact_message']->setLinkTemplate('delete-form', '/admin/structure/contact/messages/{contact_message}/delete');
   // Add clone link for forms.
   $entity_types['contact_form']->setLinkTemplate('clone-form', '/admin/structure/contact/manage/{contact_form}/clone');
+
+  // Define the entity route provider.
+  $route_providers = $entity_types['contact_message']->getRouteProviderClasses();
+  $route_providers['html'] = '\Drupal\contact_storage\ContactRouteProvider';
+  $entity_types['contact_message']->setHandlerClass('route_provider', $route_providers);
+  $entity_types['contact_form']->setHandlerClass('route_provider', $route_providers);
+
   // @todo Replace with access control handler when not enough.
   $entity_types['contact_message']->set('admin_permission', 'administer contact forms');
   // Integrate with Views.
