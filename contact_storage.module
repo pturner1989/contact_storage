@@ -13,6 +13,7 @@ use Drupal\contact\ContactFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\contact\Entity\ContactForm;
+use Drupal\views\Views;
 
 /**
  * Implements hook_form_FORM_ID_alter() for contact_form_form().
@@ -151,6 +152,17 @@ function contact_storage_entity_operation_alter(array &$operations, EntityInterf
       'weight' => 10,
       'url' => $entity->urlInfo('clone-form'),
     );
+
+    // Provide a link to view messages submitted form the form, if the view
+    // exists and if the user has access rights to it.
+    $view = Views::getView('contact_messages');
+    if ($view && $view->access('page_1')) {
+      $view->setDisplay('page_1');
+      $operations['view_messages'] = array(
+        'title' => t('View messages'),
+        'url' => $view->getUrl()->setOption('query', ['form' => $entity->id()]),
+      );
+    }
   }
 }
 

@@ -167,6 +167,12 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalPostForm(NULL, $edit, t('Submit the form'));
     $form = ContactForm::load('test_id_2');
     $this->assertTrue($form->uuid());
+
+    // Verify that the 'View messages' link exists for the 2 forms and that it
+    // links to the correct view.
+    $this->drupalGet('/admin/structure/contact');
+    $this->assertLinkByHref('/admin/structure/contact/messages?form=test_id');
+    $this->assertLinkByHref('/admin/structure/contact/messages?form=test_id_2');
   }
 
 }
