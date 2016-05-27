@@ -221,3 +221,24 @@ function contact_storage_entity_extra_field_info() {
   }
   return $fields;
 }
+
+/**
+ * Implements hook_mail_alter().
+ */
+function contact_storage_mail_alter(&$message) {
+  // Check that the message isn't a copy sent to the sender (page_copy).
+  if (($message['key'] == 'page_mail') && isset($message['params']['contact_message'])) {
+    $contact_message = $message['params']['contact_message'];
+    foreach ($contact_message->getFields() as $field) {
+      if ($field->getFieldDefinition()->getType() === 'contact_storage_options_email') {
+        // One of the Option email item fields. Add the recipient to the message.
+        foreach ($field as $delta => $item) {
+          $label = $item->value;
+          // Obtain the email to add to the message, using the label.
+          $email = $item->getFieldDefinition()->getSetting('allowed_values')[$label]['emails'];
+          $message['to'] .= ',' . $email;
+        }
+      }
+    }
+  }
+}

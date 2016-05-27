@@ -65,6 +65,11 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->submitContact('Test_name', $mail, 'Test_subject', 'test_id', 'Test_message');
     $this->assertText(t('Your message has been sent.'));
 
+    // Verify that only 1 message has been sent (by default, the "Send a copy
+    // to yourself" option is disabled.
+    $captured_emails = $this->drupalGetMails();
+    $this->assertTrue(count($captured_emails) === 1);
+
     // Login as admin.
     $this->drupalLogin($admin_user);
 
@@ -152,6 +157,40 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalPostForm(NULL, $edit, t('Submit the form'));
     $this->assertText('Your message has been sent.');
 
+    // Add an Options email item field to the form.
+    $settings = array('settings[allowed_values]' => "test_key1|test_label1|simpletest1@example.com\ntest_key2|test_label2|simpletest2@example.com");
+    $this->fieldUIAddNewField('admin/structure/contact/manage/test_id', 'category', 'Category', 'contact_storage_options_email', $settings);
+    // Verify that the new field shows up on the form.
+    $this->drupalGet('contact');
+    $this->assertText('Category');
+
+    // Send a message using the Options email item field and enable the "Send a
+    // copy to yourself" option.
+    $captured_emails = $this->drupalGetMails();
+    $emails_count_before = count($captured_emails);
+    $edit = [
+      'subject[0][value]' => 'Test subject',
+      'message[0][value]' => 'Test message',
+      'field_category' => 'test_key2',
+      'copy' => 'checked',
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Submit the form'));
+    $this->assertText('Your message has been sent.');
+
+    // Check that 2 messages were sent and that the body of the last
+    // message contains the added message.
+    $captured_emails = $this->drupalGetMails();
+    $emails_count_after = count($captured_emails);
+    $this->assertTrue($emails_count_after === ($emails_count_before + 2));
+    $this->assertMailString('body', 'test_key2', 2);
+
+    // The last message is the one sent as a copy, the one before it is the
+    // original. Check that the original contains the added recipients and that
+    // the copied one is only sent to the sender.
+    $logged_in_user_email = $this->loggedInUser->getEmail();
+    $this->assertTrue($captured_emails[$emails_count_after - 2]['to'] == "$mail,simpletest2@example.com");
+    $this->assertTrue($captured_emails[$emails_count_after - 1]['to'] == $logged_in_user_email);
+
     // Test clone functionality - add field to existing form.
     $this->fieldUIAddNewField('admin/structure/contact/manage/test_id', 'text_field', 'Text field', 'text');
     // Then clone it.
@@ -160,6 +199,11 @@ class ContactStorageTest extends ContactStorageTestBase {
       'id' => 'test_id_2',
       'label' => 'Cloned',
     ], t('Clone'));
+
+    $edit = [
+      'subject[0][value]' => 'Test subject',
+      'message[0][value]' => 'Test message',
+    ];
 
     // The added field should be on the cloned form too.
     $edit['field_text_field[0][value]'] = 'Some text';

@@ -7,4 +7,5 @@ dependencies:
   - contact
   - user
   - views
+  - options
 configure: entity.contact_message.collection
