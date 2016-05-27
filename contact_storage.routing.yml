@@ -1,0 +1,7 @@
+contact_storage.settings:
+  path: '/admin/structure/contact/settings'
+  defaults:
+    _form: '\Drupal\contact_storage\Form\ContactStorageSettingsForm'
+    _title: 'Contact settings'
+  requirements:
+    _permission: 'administer contact forms'

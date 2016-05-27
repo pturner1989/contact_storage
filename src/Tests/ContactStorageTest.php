@@ -73,6 +73,27 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Login as admin.
     $this->drupalLogin($admin_user);
 
+    // Verify that the global setting stating whether e-mails should be sent in
+    // HTML format is false by default.
+    $this->assertFalse(\Drupal::config('contact_storage.settings')->get('send_html'));
+
+    // Verify that this first e-mail was sent in plain text format.
+    $captured_emails = $this->drupalGetMails();
+    $this->assertTrue(strpos($captured_emails[0]['headers']['Content-Type'], 'text/plain') !== FALSE);
+
+    // Go to the settings form and enable sending messages in HTML format.
+    $this->drupalGet('/admin/structure/contact/settings');
+    $enable_html = array(
+      'send_html' => TRUE,
+    );
+    $this->drupalPostForm(NULL, $enable_html, t('Save configuration'));
+
+    // Check that the form POST was successful.
+    $this->assertText('The configuration options have been saved.');
+
+    // Check that the global setting is properly updated.
+    $this->assertTrue(\Drupal::config('contact_storage.settings')->get('send_html'));
+
     $display_fields = array(
       "The sender's name",
       "The sender's email",
@@ -138,6 +159,10 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalPostForm('contact', $edit, t('Send message'));
     $this->assertText('Your message has been sent.');
     $this->assertEqual($this->url, $admin_user->urlInfo()->setAbsolute()->toString());
+
+    // Check that this new message is now in HTML format.
+    $captured_emails = $this->drupalGetMails();
+    $this->assertTrue(strpos($captured_emails[1]['headers']['Content-Type'], 'text/html') !== FALSE);
 
     // Fill the "Submit button text" field and assert the form can still be
     // submitted.
