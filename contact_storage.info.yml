@@ -8,4 +8,5 @@ dependencies:
   - user
   - views
   - options
+  - token
 configure: entity.contact_message.collection
