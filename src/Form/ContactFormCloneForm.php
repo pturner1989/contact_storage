@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\field\Entity\FieldConfig;
 use Egulias\EmailValidator\EmailValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,6 +32,7 @@ class ContactFormCloneForm extends ContactFormEditForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('email.validator'),
+      $container->get('path.validator'),
       $container->get('entity_field.manager')
     );
   }
@@ -40,11 +42,13 @@ class ContactFormCloneForm extends ContactFormEditForm {
    *
    * @param \Egulias\EmailValidator\EmailValidator $email_validator
    *   Email validator.
+   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   *   The path validator.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
    *   Entity field manager.
    */
-  public function __construct(EmailValidator $email_validator, EntityFieldManagerInterface $field_manager) {
-    parent::__construct($email_validator);
+  public function __construct(EmailValidator $email_validator, PathValidatorInterface $path_validator, EntityFieldManagerInterface $field_manager) {
+    parent::__construct($email_validator, $path_validator);
     $this->fieldManager = $field_manager;
   }
 
