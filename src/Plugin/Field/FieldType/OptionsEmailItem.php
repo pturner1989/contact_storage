@@ -159,7 +159,7 @@ class OptionsEmailItem extends ListItemBase {
   protected function allowedValuesString($values) {
     $lines = array();
     foreach ($values as $key => $value) {
-      $lines[] = $key . '|' .  $value['value'] . '|' . $value['emails'];
+      $lines[] = $key . '|' . $value['value'] . '|' . $value['emails'];
     }
     return implode("\n", $lines);
   }

@@ -1,11 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\contact_storage\Tests\ContactStorageTest.
- */
-
 namespace Drupal\contact_storage\Tests;
+
 use Drupal\contact\Entity\ContactForm;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
 
@@ -97,7 +93,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $display_fields = array(
       "The sender's name",
       "The sender's email",
-      "Subject"
+      "Subject",
     );
 
     // Check that name, subject and mail are configurable on display.

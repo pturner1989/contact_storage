@@ -55,6 +55,7 @@ function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface
   ];
   $form['#entity_builders'][] = 'contact_storage_contact_form_form_builder';
 }
+
 /**
  * Entity builder for the contact form edit form with third party options.
  *
@@ -128,7 +129,6 @@ function contact_storage_entity_base_field_info(EntityTypeInterface $entity_type
   }
 }
 
-
 /**
  * Implements hook_entity_base_field_info_alter().
  */
@@ -179,7 +179,7 @@ function contact_storage_entity_operation_alter(array &$operations, EntityInterf
  * Implements hook_entity_type_alter().
  */
 function contact_storage_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  /* @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   // Set the controller class for nodes to an alternate implementation of the
   // Drupal\Core\Entity\EntityStorageInterface interface.
   $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\Sql\SqlContentEntityStorage');
@@ -256,7 +256,7 @@ function contact_storage_mail_alter(&$message) {
     $contact_message = $message['params']['contact_message'];
     foreach ($contact_message->getFields() as $field) {
       if ($field->getFieldDefinition()->getType() === 'contact_storage_options_email') {
-        // One of the Option email item fields. Add the recipient to the message.
+        // Add recipients to the message from the Option email field.
         foreach ($field as $delta => $item) {
           $label = $item->value;
           // Obtain the email to add to the message, using the label.

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\contact_storage\ContactFormViewBuilder.
- */
-
 namespace Drupal\contact_storage;
 
 use Drupal\Core\Config\Config;

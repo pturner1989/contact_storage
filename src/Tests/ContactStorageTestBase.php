@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\contact_storage\Tests\ContactStorageTestBase.
- */
 
 namespace Drupal\contact_storage\Tests;
 

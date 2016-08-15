@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\contact_storage\MessageViewsData.
- */
 
 namespace Drupal\contact_storage;
 
