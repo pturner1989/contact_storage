@@ -21,3 +21,10 @@ entity.contact_form.enable:
     _title: 'Enable contact form'
   requirements:
     _entity_access: 'contact_form.enable'
+
+entity.contact.multiple_delete_confirm:
+  path: '/admin/structure/contact/messages/delete'
+  defaults:
+    _form: '\Drupal\contact_storage\Form\DeleteMultiple'
+  requirements:
+    _permission: 'administer contact forms'

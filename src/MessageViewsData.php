@@ -28,6 +28,14 @@ class MessageViewsData extends EntityViewsData {
       ),
     );
 
+    $data['contact_message']['message_bulk_form'] = array(
+      'title' => $this->t('Message operations bulk form'),
+      'help' => $this->t('Add a form element that lets you run operations on multiple messages.'),
+      'field' => array(
+        'id' => 'message_bulk_form',
+      ),
+    );
+
     return $data;
   }
 
