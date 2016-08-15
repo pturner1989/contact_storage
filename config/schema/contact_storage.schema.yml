@@ -14,6 +14,9 @@ contact.form.*.third_party.contact_storage:
     disabled_form_message:
       type: string
       label: 'Disabled contact form message'
+    maximum_submissions_user:
+      type: integer
+      label: 'Maximum submission limit per user'
 
 field.storage_settings.contact_storage_options_email:
   type: mapping

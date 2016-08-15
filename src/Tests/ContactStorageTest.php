@@ -15,6 +15,13 @@ class ContactStorageTest extends ContactStorageTestBase {
   use FieldUiTestTrait;
 
   /**
+   * An administrative user with permission to administer contact forms.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -29,15 +36,15 @@ class ContactStorageTest extends ContactStorageTestBase {
     'contact_storage',
   );
 
-  /**
-   * Tests contact messages submitted through contact form.
-   */
-  public function testContactStorage() {
+  protected function setUp() {
+    parent::setUp();
+
     $this->drupalPlaceBlock('system_breadcrumb_block');
     $this->drupalPlaceBlock('local_actions_block');
     $this->drupalPlaceBlock('page_title_block');
+
     // Create and login administrative user.
-    $admin_user = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser([
       'access site-wide contact form',
       'administer contact forms',
       'administer users',
@@ -45,8 +52,14 @@ class ContactStorageTest extends ContactStorageTestBase {
       'administer contact_message fields',
       'administer contact_message form display',
       'administer contact_message display',
-    ));
-    $this->drupalLogin($admin_user);
+    ]);
+    $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * Tests contact messages submitted through contact form.
+   */
+  public function testContactStorage() {
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
     $this->addContactForm('test_id', 'test_label', $mail, '', TRUE);
@@ -67,7 +80,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertTrue(count($captured_emails) === 1);
 
     // Login as admin.
-    $this->drupalLogin($admin_user);
+    $this->drupalLogin($this->adminUser);
 
     // Verify that the global setting stating whether e-mails should be sent in
     // HTML format is false by default.
@@ -146,7 +159,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('There is no Contact message yet.');
 
     // Fill the redirect field and assert the page is successfully redirected.
-    $edit = ['contact_storage_uri' => 'entity:user/' . $admin_user->id()];
+    $edit = ['contact_storage_uri' => 'entity:user/' . $this->adminUser->id()];
     $this->drupalPostForm('admin/structure/contact/manage/test_id', $edit, t('Save'));
     $edit = [
       'subject[0][value]' => 'Test subject',
@@ -154,7 +167,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     ];
     $this->drupalPostForm('contact', $edit, t('Send message'));
     $this->assertText('Your message has been sent.');
-    $this->assertEqual($this->url, $admin_user->urlInfo()->setAbsolute()->toString());
+    $this->assertEqual($this->url, $this->adminUser->urlInfo()->setAbsolute()->toString());
 
     // Check that this new message is now in HTML format.
     $captured_emails = $this->drupalGetMails();
@@ -293,6 +306,30 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('Disabled contact form test_disable_label_2.');
     $this->drupalGet('contact/test_disable_id_2');
     $this->assertText('custom disabled message');
+  }
+
+  public function testMaximumSubmissionLimit() {
+    // Create a new contact form with a maximum submission limit of 2.
+    $this->addContactForm('test_id_3', 'test_label', 'simpletest@example.com', '', FALSE, ['contact_storage_maximum_submissions_user' => 2]);
+    $this->assertText(t('Contact form test_label has been added.'));
+
+    // Sends 2 messages with "Send yourself a copy" option activated, shouldn't
+    // reach the limit even if 2 messages are sent twice.
+    $this->drupalGet('contact/test_id_3');
+    $edit = [
+      'subject[0][value]' => 'Test subject',
+      'message[0][value]' => 'Test message',
+      'copy' => 'checked',
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Send message'));
+    $this->assertText(t('Your message has been sent.'));
+    $this->drupalGet('contact/test_id_3');
+    $this->drupalPostForm(NULL, $edit, t('Send message'));
+    $this->assertText(t('Your message has been sent.'));
+
+    // Try accessing the form after the limit has been reached.
+    $this->drupalGet('contact/test_id_3');
+    $this->assertText(t('You have reached the maximum submission limit of 2 for this form.'));
   }
 
 }

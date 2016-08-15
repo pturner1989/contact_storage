@@ -53,6 +53,12 @@ function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface
     '#description' => t('Show the preview button?'),
     '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'show_preview', TRUE),
   ];
+  $form['contact_storage_maximum_submissions_user'] = [
+    '#type' => 'textfield',
+    '#title' => t('Maximum submissions'),
+    '#description' => t('The maximum number of times, per user, the form can be submitted (0 for unlimited).'),
+    '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'maximum_submissions_user', 0),
+  ];
   $form['#entity_builders'][] = 'contact_storage_contact_form_form_builder';
 }
 
@@ -66,6 +72,7 @@ function contact_storage_contact_form_form_builder($entity_type, ContactFormInte
   $contact_form->setThirdPartySetting('contact_storage', 'submit_text', $form_state->getValue('contact_storage_submit_text'));
   $contact_form->setThirdPartySetting('contact_storage', 'show_preview', $form_state->getValue('contact_storage_preview'));
   $contact_form->setThirdPartySetting('contact_storage', 'disabled_form_message', $form_state->getValue('contact_storage_disabled_form_message'));
+  $contact_form->setThirdPartySetting('contact_storage', 'maximum_submissions_user', $form_state->getValue('contact_storage_maximum_submissions_user'));
 }
 
 /**
@@ -87,6 +94,22 @@ function contact_storage_form_contact_message_form_alter(&$form, &$form_state, $
     if (!$contact_form->getThirdPartySetting('contact_storage', 'show_preview', TRUE)) {
       $form['actions']['preview']['#access'] = FALSE;
     }
+  }
+  // Check if the current user has reached the form's maximum submission limit.
+  $maximum_submissions_user = $contact_form->getThirdPartySetting('contact_storage', 'maximum_submissions_user', 0);
+  if (($maximum_submissions_user !== 0) && contact_storage_maximum_submissions_user($contact_form) >= $maximum_submissions_user) {
+    // Sets the error message.
+    $form['maximum_submissions_error'] = array(
+      '#type' => 'container',
+      '#markup' => t('You have reached the maximum submission limit of @limit for this form.', ['@limit' => $maximum_submissions_user]),
+      '#attributes' => array(
+        'class' => array('messages', 'messages--error'),
+      ),
+      '#weight' => -100,
+    );
+    // Remove the submit and preview buttons.
+    $form['actions']['submit']['#access'] = FALSE;
+    $form['actions']['preview']['#access'] = FALSE;
   }
 }
 
@@ -125,8 +148,39 @@ function contact_storage_entity_base_field_info(EntityTypeInterface $entity_type
       ->setTranslatable(TRUE)
       ->setReadOnly(TRUE);
 
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('User ID'))
+      ->setDescription(t('The user ID.'))
+      ->setSetting('target_type', 'contact_form')
+      ->setDefaultValueCallback('contact_storage_contact_message_default_uid');
+
+    $fields['ip_address'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('IP address'))
+      ->setDescription(t('The IP address of the submitter.'))
+      ->setDefaultValueCallback('contact_storage_contact_message_default_ip_address');
+
     return $fields;
   }
+}
+
+/**
+ * Default value callback for the contact message uid field.
+ *
+ * @return int
+ *   The user ID.
+ */
+function contact_storage_contact_message_default_uid() {
+  return \Drupal::currentUser()->id();
+}
+
+/**
+ * Default value callback for the contact message ip_address field.
+ *
+ * @return int
+ *   The client IP address.
+ */
+function contact_storage_contact_message_default_ip_address() {
+  return \Drupal::request()->getClientIp();
 }
 
 /**
@@ -141,6 +195,9 @@ function contact_storage_entity_base_field_info_alter(&$fields, EntityTypeInterf
       $fields[$field_name]->setDisplayOptions('view', array('weight' => $i));
       $i++;
     }
+    // Add a validation constraint to prevent form submission if the limit is
+    // reached.
+    $fields['message']->addConstraint('ConstactStorageMaximumSubmissions', []);
   }
 }
 
@@ -323,4 +380,35 @@ function contact_storage_field_formatter_info_alter(&$info) {
 function contact_storage_field_widget_info_alter(&$info) {
   // Let our options_email field type re-use the default options widget.
   $info['options_select']['field_types'][] = 'contact_storage_options_email';
+}
+
+/**
+ * Returns the number of times the current user has submitted the specified
+ * form.
+ *
+ * @param Drupal\contact\ContactFormInterface $contact_form
+ *   The contact_form entity.
+ *
+ * @return int
+ *   The number of times the current user has submitted the specified form.
+ */
+function contact_storage_maximum_submissions_user(ContactFormInterface $contact_form) {
+  $account = \Drupal::currentUser();
+
+  if ($account->isAnonymous()) {
+    // Anonymous user, limit per submission with the same IP address.
+    $ip_address = \Drupal::request()->getClientIp();
+    $query = \Drupal::entityQuery('contact_message')
+      ->condition('contact_form', $contact_form->id())
+      ->condition('ip_address', $ip_address)
+      ->condition('uid', $account->id());
+    return count($query->execute());
+  }
+  else {
+    // Limit per submission with the same uid.
+    $query = \Drupal::entityQuery('contact_message')
+      ->condition('contact_form', $contact_form->id())
+      ->condition('uid', $account->id());
+    return count($query->execute());
+  }
 }
