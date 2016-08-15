@@ -185,9 +185,12 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Add an Options email item field to the form.
     $settings = array('settings[allowed_values]' => "test_key1|test_label1|simpletest1@example.com\ntest_key2|test_label2|simpletest2@example.com");
     $this->fieldUIAddNewField('admin/structure/contact/manage/test_id', 'category', 'Category', 'contact_storage_options_email', $settings);
-    // Verify that the new field shows up on the form.
+    // Verify that the new field shows up correctly on the form.
     $this->drupalGet('contact');
     $this->assertText('Category');
+    $this->assertOption('edit-field-category', '_none');
+    $this->assertOption('edit-field-category', 'test_key1');
+    $this->assertOption('edit-field-category', 'test_key2');
 
     // Send a message using the Options email item field and enable the "Send a
     // copy to yourself" option.
@@ -236,6 +239,23 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalPostForm(NULL, $edit, t('Submit the form'));
     $form = ContactForm::load('test_id_2');
     $this->assertTrue($form->uuid());
+
+    // Try changing the options email label, field default value and setting it
+    // to required.
+    $this->drupalGet('/admin/structure/contact/manage/test_id/fields');
+    $this->clickLink('Edit');
+    $this->drupalPostForm(NULL, [
+      'label' => 'Category-2',
+      'required' => TRUE,
+      'default_value_input[field_category]' => 'test_key1',
+    ], t('Save settings'));
+
+    // Verify that the changes are visible into the contact form.
+    $this->drupalGet('contact');
+    $this->assertText('Category-2');
+    $this->assertOption('edit-field-category', 'test_key1');
+    $this->assertOption('edit-field-category', 'test_key2');
+    $this->assertTrue($this->xpath('//select[@id="edit-field-category" and @required="required"]//option[@value="test_key1" and @selected="selected"]'));
 
     // Verify that the 'View messages' link exists for the 2 forms and that it
     // links to the correct view.

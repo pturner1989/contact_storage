@@ -280,3 +280,19 @@ function template_preprocess_swiftmailer__contact(&$variables) {
   $variables['subject'] = $variables['message']['subject'];
   $variables['body'] = $variables['message']['body'];
 }
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function contact_storage_field_formatter_info_alter(&$info) {
+  // Let our options_email field type re-use the default list formatter.
+  $info['list_default']['field_types'][] = 'contact_storage_options_email';
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function contact_storage_field_widget_info_alter(&$info) {
+  // Let our options_email field type re-use the default options widget.
+  $info['options_select']['field_types'][] = 'contact_storage_options_email';
+}
