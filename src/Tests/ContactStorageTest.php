@@ -262,6 +262,41 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->drupalGet('/admin/structure/contact');
     $this->assertLinkByHref('/admin/structure/contact/messages?form=test_id');
     $this->assertLinkByHref('/admin/structure/contact/messages?form=test_id_2');
+
+    // Create a new contact form and assert that the disable link exists for
+    // each forms.
+    $this->addContactForm('test_disable_id', 'test_disable_label', 'simpletest@example.com', '', FALSE);
+    $this->drupalGet('/admin/structure/contact');
+    $contact_form_count = count(ContactForm::loadMultiple());
+    $this->assertEqual(count($this->cssSelect('li.disable a:contains(Disable)')), $contact_form_count);
+
+    // Disable the form and assert that there is 1 less "Disable" button and 1
+    // "Enable" button.
+    $this->drupalPostForm('/admin/structure/contact/manage/test_disable_id/disable', NULL, t('Disable'));
+    $this->assertText('Disabled contact form test_disable_label.');
+    $this->drupalGet('/admin/structure/contact');
+    $this->assertEqual(count($this->cssSelect('li.disable a:contains(Disable)')), ($contact_form_count - 1));
+    $this->assertEqual(count($this->cssSelect('li.enable a:contains(Enable)')), 1);
+
+    // Assert that the disabled form has no input or text area and the message.
+    $this->drupalGet('contact/test_disable_id');
+    $this->assertEqual(count($this->cssSelect('input')), 0);
+    $this->assertEqual(count($this->cssSelect('textarea')), 0);
+    $this->assertText('This contact form has been disabled.');
+
+    // Try to re-enable the form and assert that it can be accessed.
+    $this->drupalPostForm('/admin/structure/contact/manage/test_disable_id/enable', NULL, t('Enable'));
+    $this->assertText('Enabled contact form test_disable_label.');
+    $this->drupalGet('contact/test_disable_id');
+    $this->assertNoText('This contact form has been disabled.');
+
+    // Create a new contact form with a custom disabled message, disable it and
+    // assert that the message displayed is correct.
+    $this->addContactForm('test_disable_id_2', 'test_disable_label_2', 'simpletest@example.com', '', FALSE, ['contact_storage_disabled_form_message' => 'custom disabled message']);
+    $this->drupalPostForm('/admin/structure/contact/manage/test_disable_id_2/disable', NULL, t('Disable'));
+    $this->assertText('Disabled contact form test_disable_label_2.');
+    $this->drupalGet('contact/test_disable_id_2');
+    $this->assertText('custom disabled message');
   }
 
 }

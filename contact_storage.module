@@ -6,6 +6,8 @@
  */
 
 use Drupal\contact\MessageForm;
+use Drupal\contact_storage\Form\ContactFormDisableForm;
+use Drupal\contact_storage\Form\ContactFormEnableForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -39,6 +41,12 @@ function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface
     '#description' => t("Override the submit button's default <em>Send message</em> text."),
     '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'submit_text', 'Send message'),
   ];
+  $form['contact_storage_disabled_form_message'] = [
+    '#type' => 'textfield',
+    '#title' => t('Default disabled contact form message'),
+    '#description' => t('Default message to display if the contact form is disabled.'),
+    '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'disabled_form_message', t('This contact form has been disabled.')),
+  ];
   $form['contact_storage_preview'] = [
     '#type' => 'checkbox',
     '#title' => t('Allow preview'),
@@ -56,6 +64,7 @@ function contact_storage_contact_form_form_builder($entity_type, ContactFormInte
   $contact_form->setThirdPartySetting('contact_storage', 'redirect_uri', $form_state->getValue('contact_storage_uri'));
   $contact_form->setThirdPartySetting('contact_storage', 'submit_text', $form_state->getValue('contact_storage_submit_text'));
   $contact_form->setThirdPartySetting('contact_storage', 'show_preview', $form_state->getValue('contact_storage_preview'));
+  $contact_form->setThirdPartySetting('contact_storage', 'disabled_form_message', $form_state->getValue('contact_storage_disabled_form_message'));
 }
 
 /**
@@ -210,6 +219,17 @@ function contact_storage_entity_type_alter(array &$entity_types) {
   if (\Drupal::config('contact_storage.settings')->get('send_html')) {
     $entity_types['contact_message']->setViewBuilderClass('Drupal\contact_storage\ContactMessageViewBuilder');
   }
+
+  $keys = $entity_types['contact_form']->getKeys();
+  $keys['status'] = 'status';
+  $entity_types['contact_form']->set('entity_keys', $keys);
+
+  // Handler classes and templates for the Enable and Disable options.
+  $entity_types['contact_form']
+    ->setFormClass('disable', ContactFormDisableForm::class)
+    ->setFormClass('enable', ContactFormEnableForm::class)
+    ->setLinkTemplate('enable', '/admin/structure/contact/view/{contact_form}/enable')
+    ->setLinkTemplate('disable', '/admin/structure/contact/view/{contact_form}/disable');
 }
 
 /**
@@ -263,6 +283,14 @@ function contact_storage_theme() {
     'swiftmailer__contact' => array(
       'variables' => array(
         'message' => array(),
+      ),
+    ),
+    'contact_storage_disabled_form' => array(
+      'template' => 'contact-storage-disabled-form',
+      'variables' => array(
+        'contact_form' => NULL,
+        'redirect_uri' => '',
+        'disabled_form_message' => '',
       ),
     ),
   );

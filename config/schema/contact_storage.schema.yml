@@ -11,6 +11,9 @@ contact.form.*.third_party.contact_storage:
     show_preview:
       type: boolean
       label: 'Show preview button'
+    disabled_form_message:
+      type: string
+      label: 'Disabled contact form message'
 
 field.storage_settings.contact_storage_options_email:
   type: mapping
