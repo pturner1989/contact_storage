@@ -69,7 +69,7 @@ class BulkFormTest extends ContactStorageTestBase {
     $this->drupalGet('test-contact-message-bulk-form');
     $elements = $this->xpath('//select[@id="edit-action"]//option');
     $this->assertIdentical(count($elements), 1, 'All contact message operations are found.');
-    $this->drupalPostForm('test-contact-message-bulk-form', [], t('Apply'));
+    $this->drupalPostForm('test-contact-message-bulk-form', [], t('Apply to selected items'));
     $this->assertText(t('No message selected.'));
   }
 

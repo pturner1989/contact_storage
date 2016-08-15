@@ -23,13 +23,13 @@ abstract class ContactStorageTestBase extends WebTestBase {
    *   form.
    * @param bool $selected
    *   A Boolean indicating whether the form should be selected by default.
+   * @param array $third_party_settings
+   *   Array of third party settings to be added to the posted form data.
    * @param string $message
    *   The message that will be displayed to a user upon completing the contact
    *   form.
-   * @param array $third_party_settings
-   *   Array of third party settings to be added to the posted form data.
    */
-  function addContactForm($id, $label, $recipients, $reply, $selected, $message = 'Your message has been sent.', $third_party_settings = []) {
+  function addContactForm($id, $label, $recipients, $reply, $selected, $third_party_settings = [], $message = 'Your message has been sent.') {
     $this->drupalGet('admin/structure/contact/add');
     $edit = [];
     $edit['label'] = $label;
