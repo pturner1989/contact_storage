@@ -308,6 +308,52 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('custom disabled message');
   }
 
+  /**
+   * Tests the url alias creation feature.
+   */
+  public function testUrlAlias() {
+    $mail = 'simpletest@example.com';
+    // Test for alias without slash.
+    $this->addContactForm('form_alias_1', 'contactForm', $mail, '', FALSE, ['contact_storage_url_alias' => 'form51']);
+    $this->assertText('The alias path has to start with a slash.');
+    $this->drupalGet('form51');
+    $this->assertResponse(404);
+
+    // Test for correct alias. Verify that we land on the correct contact form.
+    $this->addContactForm('form_alias_2', 'contactForm', $mail, '', FALSE, ['contact_storage_url_alias' => '/form51']);
+    $this->assertText('Contact form contactForm has been added.');
+    $this->drupalGet('form51');
+    $this->assertResponse(200);
+    $this->assertText('contactForm');
+
+    // Edit the contact form by changing the alias. Verify that the new alias
+    // is generated and the old one removed.
+    $this->drupalPostForm('admin/structure/contact/manage/form_alias_2', ['contact_storage_url_alias' => '/form52'], 'Save');
+    $this->assertText('Contact form contactForm has been updated.');
+    $this->drupalGet('form51');
+    $this->assertResponse(404);
+    $this->drupalGet('form52');
+    $this->assertResponse(200);
+    $this->assertText('contactForm');
+
+    // Edit the contact form by removing the alias. Verify that is is deleted.
+    $this->drupalPostForm('admin/structure/contact/manage/form_alias_2', ['contact_storage_url_alias' => ''], 'Save');
+    $this->assertText('Contact form contactForm has been updated.');
+    $this->drupalGet('form52');
+    $this->assertResponse(404);
+
+    // Add an alias back and delete the contact form. Verify that the alias is
+    // deleted along with the contact form.
+    $this->drupalPostForm('admin/structure/contact/manage/form_alias_2', ['contact_storage_url_alias' => '/form52'], 'Save');
+    $this->assertText('Contact form contactForm has been updated.');
+    $this->drupalGet('form52');
+    $this->assertResponse(200);
+    $this->assertText('contactForm');
+    $this->drupalPostForm('admin/structure/contact/manage/form_alias_2/delete', [], 'Delete');
+    $alias = \Drupal::service('path.alias_storage')->load(['source' => '/contact/form_alias_2']);
+    $this->assertFalse($alias);
+  }
+
   public function testMaximumSubmissionLimit() {
     // Create a new contact form with a maximum submission limit of 2.
     $this->addContactForm('test_id_3', 'test_label', 'simpletest@example.com', '', FALSE, ['contact_storage_maximum_submissions_user' => 2]);
