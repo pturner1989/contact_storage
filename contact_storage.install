@@ -42,7 +42,7 @@ function _contact_storage_ensure_fields() {
   $field_manager = \Drupal::service('entity_field.manager');
 
   $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
-  foreach (['id', 'created'] as $field_name) {
+  foreach (['id', 'created', 'uid', 'ip_address'] as $field_name) {
     $field_definition = $field_manager->getFieldStorageDefinitions('contact_message')[$field_name];
     $entity_definition_update_manager->installFieldStorageDefinition($field_name, 'contact_message', 'contact_storage', $field_definition);
   }
