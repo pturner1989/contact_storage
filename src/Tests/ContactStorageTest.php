@@ -4,6 +4,7 @@ namespace Drupal\contact_storage\Tests;
 
 use Drupal\contact\Entity\ContactForm;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Tests storing contact messages and viewing them through UI.
@@ -30,6 +31,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     'text',
     'block',
     'contact',
+    'language',
     'field_ui',
     'contact_storage_test',
     'contact_test',
@@ -322,6 +324,15 @@ class ContactStorageTest extends ContactStorageTestBase {
    * Tests the url alias creation feature.
    */
   public function testUrlAlias() {
+
+    // Add a second language to make sure aliases work with any language.
+    $language = ConfigurableLanguage::createFromLangcode('de');
+    $language->save();
+
+    // Set the second language as default.
+    $this->config('system.site')->set('default_langcode', $language->getId())->save();
+    $this->rebuildContainer();
+
     $mail = 'simpletest@example.com';
     // Test for alias without slash.
     $this->addContactForm('form_alias_1', 'contactForm', $mail, '', FALSE, ['contact_storage_url_alias' => 'form51']);

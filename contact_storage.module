@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\contact\ContactFormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\contact\Entity\ContactForm;
 use Drupal\views\Views;
@@ -140,7 +141,7 @@ function contact_storage_contact_form_form_submit(&$form, FormStateInterface &$f
     }
     // Only save a non-empty alias.
     elseif ($new_alias) {
-      \Drupal::service('path.alias_storage')->save('/' . $entity->toUrl('canonical')->getInternalPath(), $formState->getValue('contact_storage_url_alias'), 'en', $old_alias['pid']);
+      \Drupal::service('path.alias_storage')->save('/' . $entity->toUrl('canonical')->getInternalPath(), $formState->getValue('contact_storage_url_alias'), LanguageInterface::LANGCODE_NOT_SPECIFIED, $old_alias['pid']);
     }
   }
 }
