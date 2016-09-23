@@ -309,6 +309,16 @@ class ContactStorageTest extends ContactStorageTestBase {
   }
 
   /**
+   * Tests the redirect page validation.
+   */
+  public function testRedirectPage() {
+    // Add a contact form with invalid redirect page.
+    $mail = 'simpletest@example.com';
+    $this->addContactForm('test_id', 'test_label', $mail, '', TRUE, ['contact_storage_uri' => '/']);
+    $this->assertText('The Redirect page is not valid.');
+  }
+
+  /**
    * Tests the url alias creation feature.
    */
   public function testUrlAlias() {

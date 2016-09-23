@@ -104,6 +104,14 @@ function contact_storage_contact_form_form_validate(&$form, FormStateInterface &
       $formState->setError($form['contact_storage_url_alias'], 'The alias path has to start with a slash.');
     }
   }
+  if ($redirect_uri = $formState->getValue('contact_storage_uri')) {
+    try {
+      Url::fromUri($redirect_uri);
+    }
+    catch (\Exception $e) {
+      $formState->setErrorByName('contact_storage_uri', t('The Redirect page is not valid.'));
+    }
+  }
 }
 
 /**
