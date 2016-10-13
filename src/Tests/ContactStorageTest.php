@@ -160,21 +160,6 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Make sure no messages are available.
     $this->assertText('There is no Contact message yet.');
 
-    // Fill the redirect field and assert the page is successfully redirected.
-    $edit = ['contact_storage_uri' => 'entity:user/' . $this->adminUser->id()];
-    $this->drupalPostForm('admin/structure/contact/manage/test_id', $edit, t('Save'));
-    $edit = [
-      'subject[0][value]' => 'Test subject',
-      'message[0][value]' => 'Test message',
-    ];
-    $this->drupalPostForm('contact', $edit, t('Send message'));
-    $this->assertText('Your message has been sent.');
-    $this->assertEqual($this->url, $this->adminUser->urlInfo()->setAbsolute()->toString());
-
-    // Check that this new message is now in HTML format.
-    $captured_emails = $this->drupalGetMails();
-    $this->assertTrue(strpos($captured_emails[1]['headers']['Content-Type'], 'text/html') !== FALSE);
-
     // Fill the "Submit button text" field and assert the form can still be
     // submitted.
     $edit = [
@@ -308,16 +293,6 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('Disabled contact form test_disable_label_2.');
     $this->drupalGet('contact/test_disable_id_2');
     $this->assertText('custom disabled message');
-  }
-
-  /**
-   * Tests the redirect page validation.
-   */
-  public function testRedirectPage() {
-    // Add a contact form with invalid redirect page.
-    $mail = 'simpletest@example.com';
-    $this->addContactForm('test_id', 'test_label', $mail, '', TRUE, ['contact_storage_uri' => '/']);
-    $this->assertText('The Redirect page is not valid.');
   }
 
   /**
