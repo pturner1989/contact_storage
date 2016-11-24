@@ -252,14 +252,14 @@ function contact_storage_entity_operation_alter(array &$operations, EntityInterf
     $operations['view'] = array(
       'title' => t('View'),
       'weight' => 0,
-      'url' => $entity->urlInfo('canonical'),
+      'url' => $entity->toUrl('canonical'),
     );
   }
   if ($entity->getEntityTypeId() == 'contact_form' && $entity->access('update')) {
     $operations['clone'] = array(
       'title' => t('Clone'),
       'weight' => 10,
-      'url' => $entity->urlInfo('clone-form'),
+      'url' => $entity->toUrl('clone-form'),
     );
 
     // Provide a link to view messages submitted form the form, if the view
