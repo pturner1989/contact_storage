@@ -113,3 +113,10 @@ function contact_storage_update_8200() {
     }
   }
 }
+
+/**
+ * Enables the options module as it is now a dependency.
+ */
+function contact_storage_update_8201() {
+  \Drupal::service('module_installer')->install(['options']);
+}
