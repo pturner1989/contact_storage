@@ -8,7 +8,6 @@ dependencies:
   - drupal:user
   - drupal:views
   - drupal:options
-  - drupal:filter
   - token:token
   - drupal:system (>=8.2)
 configure: entity.contact_message.collection
