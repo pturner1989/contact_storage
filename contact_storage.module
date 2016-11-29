@@ -65,6 +65,23 @@ function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface
     '#description' => t('The maximum number of times, per user, the form can be submitted (0 for unlimited).'),
     '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'maximum_submissions_user', 0),
   ];
+
+  // Overrides the 'reply' field provided by Core with a formattable field. If
+  // html e-mails are disabled, enforce plain text format.
+  $form['reply']['#type'] = 'text_format';
+  if (!\Drupal::config('contact_storage.settings')->get('send_html')) {
+    $form['reply']['#allowed_formats'] = ['plain_text'];
+  }
+  else {
+    $form['reply']['#format'] = $contact_form->getThirdPartySetting('contact_storage', 'page_autoreply_format', 'plain_text');
+    // Explicitly set the allowed formats so that the fallback format is not
+    // removed. That allows to prevent any formatting and is the default option,
+    // without setting it, this option would go away after selecting something
+    // else.
+    $formats = filter_formats(\Drupal::currentUser());
+    $form['reply']['#allowed_formats'] = array_keys($formats);
+  }
+
   $form['#entity_builders'][] = 'contact_storage_contact_form_form_builder';
   $form['#validate'][] = 'contact_storage_contact_form_form_validate';
   $form['actions']['submit']['#submit'][] = 'contact_storage_contact_form_form_submit';
@@ -80,6 +97,13 @@ function contact_storage_contact_form_form_builder($entity_type, ContactFormInte
   $contact_form->setThirdPartySetting('contact_storage', 'show_preview', $form_state->getValue('contact_storage_preview'));
   $contact_form->setThirdPartySetting('contact_storage', 'disabled_form_message', $form_state->getValue('contact_storage_disabled_form_message'));
   $contact_form->setThirdPartySetting('contact_storage', 'maximum_submissions_user', $form_state->getValue('contact_storage_maximum_submissions_user'));
+
+  // Auto-reply value is handled by Core; 'reply' is expected to be a string.
+  $reply = $form_state->getValue('reply');
+  if (isset($reply['value'])) {
+    $form_state->setValue('reply', $reply['value']);
+    $contact_form->setThirdPartySetting('contact_storage', 'page_autoreply_format', $reply['format']);
+  }
 }
 
 /**
@@ -366,12 +390,21 @@ function contact_storage_mail_alter(&$message) {
       }
     }
   }
-  // If enabled, ensure that contact mails are sent as plain text.
-  if ($message['module'] === 'contact' && isset($message['params']['contact_message']) && \Drupal::config('contact_storage.settings')->get('send_html')) {
-    // Enforce that we are sending mails as HTML, and tell Swiftmailer to
-    // generate a plain text version.
-    $message['headers']['Content-Type'] = 'text/html';
-    $message['params']['convert'] = TRUE;
+  if ($message['module'] === 'contact' && isset($message['params']['contact_message'])) {
+    if (($message['key'] == 'page_autoreply')) {
+      $contact_form = $message['params']['contact_form'];
+      // Filters the auto-reply message using the chosen format and sets it.
+      if ($reply = $contact_form->getReply()) {
+        $filtered_reply = check_markup($contact_form->getReply(), $contact_form->getThirdPartySetting('contact_storage', 'page_autoreply_format', 'plain_text'));
+        $message['body'] = [$filtered_reply];
+      }
+    }
+    // Enforce that we are sending mails as html, if enabled, and tell
+    // Swiftmailer to generate a plain text version.
+    if (\Drupal::config('contact_storage.settings')->get('send_html')) {
+      $message['headers']['Content-Type'] = 'text/html';
+      $message['params']['convert'] = TRUE;
+    }
   }
 }
 

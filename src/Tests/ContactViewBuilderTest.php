@@ -63,7 +63,7 @@ class ContactViewBuilderTest extends ContactStorageTestBase {
 
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
-    $this->addContactForm('test_id', 'test_label', $mail, '', TRUE);
+    $this->addContactForm('test_id', 'test_label', $mail, TRUE);
     $this->assertText(t('Contact form test_label has been added.'));
 
     $field_name = 'contact';
