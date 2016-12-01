@@ -34,7 +34,7 @@ function contact_storage_form_contact_form_form_alter(&$form, FormStateInterface
     '#type' => 'textfield',
     '#title' => t('Submit button text'),
     '#description' => t("Override the submit button's default <em>Send message</em> text."),
-    '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'submit_text', 'Send message'),
+    '#default_value' => $contact_form->getThirdPartySetting('contact_storage', 'submit_text', t('Send message')),
   ];
   $form['contact_storage_url_alias'] = [
     '#type' => 'textfield',
