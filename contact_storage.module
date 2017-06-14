@@ -15,7 +15,27 @@ use Drupal\contact\ContactFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\contact\Entity\ContactForm;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\views\Views;
+
+/**
+ * Implements hook_help().
+ */
+function contact_storage_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.contact_storage':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The <a href="https://www.drupal.org/project/contact_storage">Contact Storage</a> module allows registered <em>users</em> on your site to see messages sent by <em>visitors</em> when using personal or site-wide forms. The Contact Storage module provides the ability to store the messages so registered users can later view them thru the site.') . '</p>';
+      $output .= '<p>' . t('The combination of  <a href="contact">Contact</a> and Contact Storage modules allows for a general means to create, read, update and delete user generated data. For more information, see the <a href=":contact_storage">online documentation for the Contact Storage module</a>.', array(':contact_storage' => 'https://www.drupal.org/node/2718407')) . '</p>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Using the Contact messages page') . '</dt>';
+      $output .= '<dd>' . t('Registered users can access stored messages on the <a href=":url">Contact messages</a> page.  This page can be manually accessed from the Administration menu path "Home >> Administration >> Structure >> Contact forms".  The Contact Storage module places the "List" tab on the "Contact forms" page. The "Contact messages" page is displayed when the List tab is selected.  View, edit and delete operations can be performed on individual messages from this listing of contact messages.', array(':url' => \Drupal::url('entity.contact_message.collection'))) . '</dd>';
+      $output .= '<dt>' . t('Configuring contact message pages') . '</dt>';
+      $output .= '<dd>' . t('The listing of Contact messages is a <a href=":url">Views</a> page.  This page can be manually accessed from the Administration menu path "Home >> Administration >> Structure >> Views" like any other view. It has a VIEW NAME of "Contact messages". Registered users can perform Edit, Duplicate, Disable and Delete Operations from the Views listing page.', array(':url' => \Drupal::url('entity.view.collection'))) . '</dd>';
+      return $output;
+  }
+}
 
 /**
  * Implements hook_form_FORM_ID_alter() for contact_form_form().
