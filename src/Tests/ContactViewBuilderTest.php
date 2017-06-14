@@ -71,7 +71,7 @@ class ContactViewBuilderTest extends ContactStorageTestBase {
     $bundle_name = 'article';
 
     // Add a Entity Reference Contact Field to Article content type.
-    $field_storage = \Drupal::entityManager()
+    $field_storage = \Drupal::entityTypeManager()
       ->getStorage('field_storage_config')
       ->create([
         'field_name' => $field_name,
@@ -80,7 +80,7 @@ class ContactViewBuilderTest extends ContactStorageTestBase {
         'settings' => ['target_type' => 'contact_form'],
       ]);
     $field_storage->save();
-    $field = \Drupal::entityManager()
+    $field = \Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->create([
         'field_storage' => $field_storage,
