@@ -2,6 +2,7 @@
 
 namespace Drupal\contact_storage\Plugin\Field\FieldType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\options\Plugin\Field\FieldType\ListItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -25,7 +26,7 @@ class OptionsEmailItem extends ListItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Text value'))
+      ->setLabel(new TranslatableMarkup('Text value'))
       ->addConstraint('Length', ['max' => 255])
       ->setRequired(TRUE);
 
@@ -53,12 +54,12 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected function allowedValuesDescription() {
-    $description = '<p>' . t('The possible values this field can contain. Enter one value per line, in the format key|label|emails.');
-    $description .= '<br/>' . t('"key" is the message that is added to the body of the message.');
-    $description .= '<br/>' . t('"label" is the value displayed in the dropdown menu on the contact form.');
-    $description .= '<br/>' . t('"emails" are the email addresses to add to the recipients list (each separated by a comma).');
+    $description = '<p>' . $this->t('The possible values this field can contain. Enter one value per line, in the format key|label|emails.');
+    $description .= '<br/>' . $this->t('"key" is the message that is added to the body of the message.');
+    $description .= '<br/>' . $this->t('"label" is the value displayed in the dropdown menu on the contact form.');
+    $description .= '<br/>' . $this->t('"emails" are the email addresses to add to the recipients list (each separated by a comma).');
     $description .= '</p>';
-    $description .= '<p>' . t('Allowed HTML tags in labels: @tags', ['@tags' => $this->displayAllowedTags()]) . '</p>';
+    $description .= '<p>' . $this->t('Allowed HTML tags in labels: @tags', ['@tags' => $this->displayAllowedTags()]) . '</p>';
     return $description;
   }
 
@@ -133,6 +134,7 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   public function getSettableOptions(AccountInterface $account = NULL) {
+    $allowed_options_keys = [];
     $allowed_options = $this->getOptionsAllowedValues();
     // Each option is currently an array containing the value and emails, keyed
     // with the key defined by the user. Remove the array to keep only the key.

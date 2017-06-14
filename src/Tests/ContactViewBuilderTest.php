@@ -64,7 +64,7 @@ class ContactViewBuilderTest extends ContactStorageTestBase {
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
     $this->addContactForm('test_id', 'test_label', $mail, TRUE);
-    $this->assertText(t('Contact form test_label has been added.'));
+    $this->assertText('Contact form test_label has been added.');
 
     $field_name = 'contact';
     $entity_type = 'node';
@@ -125,9 +125,9 @@ class ContactViewBuilderTest extends ContactStorageTestBase {
     $node = $this->drupalGetNodeByTitle($edit[$title_key]);
     $this->drupalGet('node/' . $node->id());
     // Some fields should be present.
-    $this->assertText(t('Your email address'));
-    $this->assertText(t('Subject'));
-    $this->assertText(t('Message'));
+    $this->assertText('Your email address');
+    $this->assertText('Subject');
+    $this->assertText('Message');
     $this->assertFieldByName('subject[0][value]');
     $this->assertFieldByName('message[0][value]');
   }

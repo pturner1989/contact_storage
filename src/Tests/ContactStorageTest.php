@@ -74,16 +74,16 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
     $this->addContactForm('test_id', 'test_label', $mail, TRUE);
-    $this->assertText(t('Contact form test_label has been added.'));
+    $this->assertText('Contact form test_label has been added.');
 
     // Ensure that anonymous can submit site-wide contact form.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, ['access site-wide contact form']);
     $this->drupalLogout();
     $this->drupalGet('contact');
-    $this->assertText(t('Your email address'));
+    $this->assertText('Your email address');
     $this->assertNoText(t('Form'));
     $this->submitContact('Test_name', $mail, 'Test_subject', 'test_id', 'Test_message');
-    $this->assertText(t('Your message has been sent.'));
+    $this->assertText('Your message has been sent.');
 
     // Verify that only 1 message has been sent (by default, the "Send a copy
     // to yourself" option is disabled.
@@ -372,7 +372,7 @@ class ContactStorageTest extends ContactStorageTestBase {
   public function testMaximumSubmissionLimit() {
     // Create a new contact form with a maximum submission limit of 2.
     $this->addContactForm('test_id_3', 'test_label', 'simpletest@example.com', FALSE, ['contact_storage_maximum_submissions_user' => 2]);
-    $this->assertText(t('Contact form test_label has been added.'));
+    $this->assertText('Contact form test_label has been added.');
 
     // Sends 2 messages with "Send yourself a copy" option activated, shouldn't
     // reach the limit even if 2 messages are sent twice.
@@ -383,14 +383,14 @@ class ContactStorageTest extends ContactStorageTestBase {
       'copy' => 'checked',
     ];
     $this->drupalPostForm(NULL, $edit, t('Send message'));
-    $this->assertText(t('Your message has been sent.'));
+    $this->assertText('Your message has been sent.');
     $this->drupalGet('contact/test_id_3');
     $this->drupalPostForm(NULL, $edit, t('Send message'));
-    $this->assertText(t('Your message has been sent.'));
+    $this->assertText('Your message has been sent.');
 
     // Try accessing the form after the limit has been reached.
     $this->drupalGet('contact/test_id_3');
-    $this->assertText(t('You have reached the maximum submission limit of 2 for this form.'));
+    $this->assertText('You have reached the maximum submission limit of 2 for this form.');
   }
 
   /**
@@ -399,7 +399,7 @@ class ContactStorageTest extends ContactStorageTestBase {
   public function testAutoReplyField() {
     // Create a new contact form with an auto-reply.
     $this->addContactForm('test_auto_reply_id_1', 'test_auto_reply_label_1', 'simpletest@example.com', TRUE, ['reply[value]' => "auto_reply_1\nsecond_line"]);
-    $this->assertText(t('Contact form test_auto_reply_label_1 has been added.'));
+    $this->assertText('Contact form test_auto_reply_label_1 has been added.');
 
     // Verify that the auto-reply shows up in the field and only offers
     // one format (plain text), since html e-mails are disabled.

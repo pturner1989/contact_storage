@@ -43,17 +43,17 @@ class BulkFormTest extends ContactStorageTestBase {
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
     $this->addContactForm('test_id', 'test_label', $mail, TRUE);
-    $this->assertText(t('Contact form test_label has been added.'));
+    $this->assertText('Contact form test_label has been added.');
     $this->drupalLogout();
 
     // Ensure that anonymous can submit site-wide contact form.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, ['access site-wide contact form']);
     $this->drupalGet('contact');
-    $this->assertText(t('Your email address'));
+    $this->assertText('Your email address');
     // Submit contact form few times.
     for ($i = 1; $i <= 5; $i++) {
       $this->submitContact($this->randomMachineName(), $mail, $this->randomMachineName(), 'test_id', $this->randomMachineName());
-      $this->assertText(t('Your message has been sent.'));
+      $this->assertText('Your message has been sent.');
     }
   }
 
@@ -69,7 +69,7 @@ class BulkFormTest extends ContactStorageTestBase {
     $elements = $this->xpath('//select[@id="edit-action"]//option');
     $this->assertIdentical(count($elements), 1, 'All contact message operations are found.');
     $this->drupalPostForm('test-contact-message-bulk-form', [], t('Apply to selected items'));
-    $this->assertText(t('No message selected.'));
+    $this->assertText('No message selected.');
   }
 
 }
