@@ -42,4 +42,30 @@ class ContactStorageController extends ContactController {
     return $view_builder->view($contact_form, 'full', $contact_form->language());
   }
 
+  /**
+   * Route title callback.
+   *
+   * @param \Drupal\contact\ContactFormInterface $contact_form
+   *   The contact form.
+   *
+   * @return string
+   *   The title of the contact form.
+   */
+  public function contactFormTitle(ContactFormInterface $contact_form) {
+    return $contact_form->label();
+  }
+
+  /**
+   * Edit route title callback.
+   *
+   * @param \Drupal\contact\ContactFormInterface $contact_form
+   *   The contact form.
+   *
+   * @return string
+   *   The title of the contact form.
+   */
+  public function contactEditFormTitle(ContactFormInterface $contact_form) {
+    return $this->t('Edit @label', ['@label' => $contact_form->label()]);
+  }
+
 }

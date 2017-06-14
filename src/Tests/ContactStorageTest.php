@@ -120,6 +120,16 @@ class ContactStorageTest extends ContactStorageTestBase {
       "Subject",
     ];
 
+    // Check that the page title is correct.
+    $this->drupalGet('contact/test_id');
+    $this->assertTrue(!empty($this->cssSelect('h1:contains(test_label)')));
+    $this->assertTitle('test_label | Drupal');
+
+    // Check that the configuration edit page title is correct.
+    $this->drupalGet('admin/structure/contact/manage/test_id');
+    $this->assertTrue(!empty($this->cssSelect('h1:contains(test_label)')));
+    $this->assertTitle('Edit test_label | Drupal');
+
     // Check that name, subject and mail are configurable on display.
     $this->drupalGet('admin/structure/contact/manage/test_id/display');
     foreach ($display_fields as $label) {
