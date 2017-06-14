@@ -57,7 +57,7 @@ class ContactStoragePersonalTest extends WebTestBase {
   /**
    * Tests that mails for contact messages are correctly sent.
    */
-  function testSendPersonalContactMessage() {
+  public function testSendPersonalContactMessage() {
     // Ensure that the web user's email needs escaping.
     $mail = $this->webUser->getUsername() . '&escaped@example.com';
     $this->webUser->setEmail($mail)->save();
@@ -119,4 +119,5 @@ class ContactStoragePersonalTest extends WebTestBase {
     $this->drupalPostForm('user/' . $account->id() . '/contact', $message, t('Send message'));
     return $message;
   }
+
 }

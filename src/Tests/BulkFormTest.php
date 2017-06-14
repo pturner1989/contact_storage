@@ -2,7 +2,6 @@
 
 namespace Drupal\contact_storage\Tests;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\views\Tests\ViewTestData;
 
 /**

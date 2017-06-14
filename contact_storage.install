@@ -5,6 +5,7 @@
  * Contains install and update hooks.
  */
 
+use Drupal\Core\Url;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -101,7 +102,7 @@ function contact_storage_update_8200() {
       $config = $config_factory->getEditable($name);
       $config->clear('third_party_settings.contact_storage.redirect_uri');
       try {
-        $url = '/' . \Drupal\Core\Url::fromUri($redirect_page)->getInternalPath();
+        $url = '/' . Url::fromUri($redirect_page)->getInternalPath();
       }
       catch (Exception $e) {
         continue;

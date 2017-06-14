@@ -38,4 +38,5 @@ class HTMLTestingMailSystem implements MailInterface {
     \Drupal::state()->set('system.test_mail_collector', $captured_emails);
     return TRUE;
   }
+
 }

@@ -26,7 +26,7 @@ abstract class ContactStorageTestBase extends WebTestBase {
    *   The message that will be displayed to a user upon completing the contact
    *   form.
    */
-  function addContactForm($id, $label, $recipients, $selected, $third_party_settings = [], $message = 'Your message has been sent.') {
+  public function addContactForm($id, $label, $recipients, $selected, $third_party_settings = [], $message = 'Your message has been sent.') {
     $this->drupalGet('admin/structure/contact/add');
     $edit = [];
     $edit['label'] = $label;
