@@ -19,7 +19,7 @@ class ContactStoragePersonalTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('contact', 'contact_storage', 'dblog');
+  public static $modules = ['contact', 'contact_storage', 'dblog'];
 
   /**
    * A user with some administrative permissions.
@@ -46,11 +46,11 @@ class ContactStoragePersonalTest extends WebTestBase {
     parent::setUp();
 
     // Create an admin user.
-    $this->adminUser = $this->drupalCreateUser(array('administer contact forms', 'administer users', 'administer account settings', 'access site reports'));
+    $this->adminUser = $this->drupalCreateUser(['administer contact forms', 'administer users', 'administer account settings', 'access site reports']);
 
     // Create some normal users with their contact forms enabled by default.
     $this->config('contact.settings')->set('user_default_enabled', TRUE)->save();
-    $this->webUser = $this->drupalCreateUser(array('access user profiles', 'access user contact forms'));
+    $this->webUser = $this->drupalCreateUser(['access user profiles', 'access user contact forms']);
     $this->contactUser = $this->drupalCreateUser();
   }
 
@@ -73,11 +73,11 @@ class ContactStoragePersonalTest extends WebTestBase {
     $this->assertEqual($mail['from'], $this->config('system.site')->get('mail'));
     $this->assertEqual($mail['reply-to'], $this->webUser->getEmail());
     $this->assertEqual($mail['key'], 'user_mail');
-    $variables = array(
+    $variables = [
       '@site-name' => $this->config('system.site')->get('name'),
       '@subject' => $message['subject[0][value]'],
       '@recipient-name' => $this->contactUser->getDisplayName(),
-    );
+    ];
     $subject = PlainTextOutput::renderFromHtml(t('[@site-name] @subject', $variables));
     $this->assertEqual($mail['subject'], $subject, 'Subject is in sent message.');
     $this->assertTrue(strpos($mail['body'], 'Hello ' . $variables['@recipient-name']) !== FALSE, 'Recipient name is in sent message.');
@@ -89,11 +89,11 @@ class ContactStoragePersonalTest extends WebTestBase {
     $this->drupalLogin($this->adminUser);
     // Verify that the correct watchdog message has been logged.
     $this->drupalGet('/admin/reports/dblog');
-    $placeholders = array(
+    $placeholders = [
       '@sender_name' => $this->webUser->username,
       '@sender_email' => $this->webUser->getEmail(),
       '@recipient_name' => $this->contactUser->getUsername()
-    );
+    ];
     $this->assertRaw(SafeMarkup::format('@sender_name (@sender_email) sent @recipient_name an email.', $placeholders));
     // Ensure an unescaped version of the email does not exist anywhere.
     $this->assertNoRaw($this->webUser->getEmail());
@@ -111,11 +111,11 @@ class ContactStoragePersonalTest extends WebTestBase {
    * @return array
    *   An array with the form fields being used.
    */
-  protected function submitPersonalContact(AccountInterface $account, array $message = array()) {
-    $message += array(
+  protected function submitPersonalContact(AccountInterface $account, array $message = []) {
+    $message += [
       'subject[0][value]' => $this->randomMachineName(16),
       'message[0][value]' => $this->randomMachineName(64),
-    );
+    ];
     $this->drupalPostForm('user/' . $account->id() . '/contact', $message, t('Send message'));
     return $message;
   }

@@ -28,7 +28,7 @@ class ContactStorageTest extends ContactStorageTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  public static $modules = [
     'text',
     'block',
     'contact',
@@ -38,7 +38,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     'contact_test',
     'contact_storage',
     'filter',
-  );
+  ];
 
   protected function setUp() {
     parent::setUp();
@@ -77,7 +77,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText(t('Contact form test_label has been added.'));
 
     // Ensure that anonymous can submit site-wide contact form.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access site-wide contact form'));
+    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, ['access site-wide contact form']);
     $this->drupalLogout();
     $this->drupalGet('contact');
     $this->assertText(t('Your email address'));
@@ -103,9 +103,9 @@ class ContactStorageTest extends ContactStorageTestBase {
 
     // Go to the settings form and enable sending messages in HTML format.
     $this->drupalGet('/admin/structure/contact/settings');
-    $enable_html = array(
+    $enable_html = [
       'send_html' => TRUE,
-    );
+    ];
     $this->drupalPostForm(NULL, $enable_html, t('Save configuration'));
 
     // Check that the form POST was successful.
@@ -114,11 +114,11 @@ class ContactStorageTest extends ContactStorageTestBase {
     // Check that the global setting is properly updated.
     $this->assertTrue(\Drupal::config('contact_storage.settings')->get('send_html'));
 
-    $display_fields = array(
+    $display_fields = [
       "The sender's name",
       "The sender's email",
       "Subject",
-    );
+    ];
 
     // Check that name, subject and mail are configurable on display.
     $this->drupalGet('admin/structure/contact/manage/test_id/display');
@@ -155,7 +155,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertFieldById('edit-subject-0-value', 'Test_subject');
     $this->assertFieldById('edit-message-0-value', 'Test_message');
     // Submit should redirect back to listing.
-    $this->drupalPostForm(NULL, array(), t('Save'));
+    $this->drupalPostForm(NULL, [], t('Save'));
     $this->assertUrl('admin/structure/contact/messages');
 
     // Delete the message.
@@ -188,7 +188,7 @@ class ContactStorageTest extends ContactStorageTestBase {
     $this->assertText('Your message has been sent.');
 
     // Add an Options email item field to the form.
-    $settings = array('settings[allowed_values]' => "test_key1|test_label1|simpletest1@example.com\ntest_key2|test_label2|simpletest2@example.com");
+    $settings = ['settings[allowed_values]' => "test_key1|test_label1|simpletest1@example.com\ntest_key2|test_label2|simpletest2@example.com"];
     $this->fieldUIAddNewField('admin/structure/contact/manage/test_id', 'category', 'Category', 'contact_storage_options_email', $settings);
     // Verify that the new field shows up correctly on the form.
     $this->drupalGet('contact');

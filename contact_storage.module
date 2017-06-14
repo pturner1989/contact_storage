@@ -178,14 +178,14 @@ function contact_storage_form_contact_message_form_alter(&$form, &$form_state, $
   $maximum_submissions_user = $contact_form->getThirdPartySetting('contact_storage', 'maximum_submissions_user', 0);
   if (($maximum_submissions_user !== 0) && contact_storage_maximum_submissions_user($contact_form) >= $maximum_submissions_user) {
     // Sets the error message.
-    $form['maximum_submissions_error'] = array(
+    $form['maximum_submissions_error'] = [
       '#type' => 'container',
       '#markup' => t('You have reached the maximum submission limit of @limit for this form.', ['@limit' => $maximum_submissions_user]),
-      '#attributes' => array(
-        'class' => array('messages', 'messages--error'),
-      ),
+      '#attributes' => [
+        'class' => ['messages', 'messages--error'],
+      ],
       '#weight' => -100,
-    );
+    ];
     // Remove the submit and preview buttons.
     $form['actions']['submit']['#access'] = FALSE;
     $form['actions']['preview']['#access'] = FALSE;
@@ -197,7 +197,7 @@ function contact_storage_form_contact_message_form_alter(&$form, &$form_state, $
  */
 function contact_storage_entity_base_field_info(EntityTypeInterface $entity_type) {
   if ($entity_type->id() == 'contact_message') {
-    $fields = array();
+    $fields = [];
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Message ID'))
       ->setDescription(t('The message ID.'))
@@ -257,9 +257,9 @@ function contact_storage_entity_base_field_info_alter(&$fields, EntityTypeInterf
   if ($entity_type->id() == 'contact_message') {
     // Start at min 3 because message default weight is 0.
     $i = -3;
-    foreach (array('name', 'mail', 'subject') as $field_name) {
+    foreach (['name', 'mail', 'subject'] as $field_name) {
       $fields[$field_name]->setDisplayConfigurable('view', TRUE);
-      $fields[$field_name]->setDisplayOptions('view', array('weight' => $i));
+      $fields[$field_name]->setDisplayOptions('view', ['weight' => $i]);
       $i++;
     }
     // Add a validation constraint to prevent form submission if the limit is
@@ -273,28 +273,28 @@ function contact_storage_entity_base_field_info_alter(&$fields, EntityTypeInterf
  */
 function contact_storage_entity_operation_alter(array &$operations, EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'contact_message' && $entity->access('view')) {
-    $operations['view'] = array(
+    $operations['view'] = [
       'title' => t('View'),
       'weight' => 0,
       'url' => $entity->toUrl('canonical'),
-    );
+    ];
   }
   if ($entity->getEntityTypeId() == 'contact_form' && $entity->access('update')) {
-    $operations['clone'] = array(
+    $operations['clone'] = [
       'title' => t('Clone'),
       'weight' => 10,
       'url' => $entity->toUrl('clone-form'),
-    );
+    ];
 
     // Provide a link to view messages submitted form the form, if the view
     // exists and if the user has access rights to it.
     $view = Views::getView('contact_messages');
     if ($view && $view->access('page_1')) {
       $view->setDisplay('page_1');
-      $operations['view_messages'] = array(
+      $operations['view_messages'] = [
         'title' => t('View messages'),
         'url' => $view->getUrl()->setOption('query', ['form' => $entity->id()]),
-      );
+      ];
     }
   }
 }
@@ -360,13 +360,13 @@ function contact_storage_entity_type_alter(array &$entity_types) {
  * Implements hook_entity_extra_field_info().
  */
 function contact_storage_entity_extra_field_info() {
-  $fields = array();
+  $fields = [];
   foreach (array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo('contact_message')) as $bundle) {
-    $fields['contact_message'][$bundle]['form']['preview'] = array(
+    $fields['contact_message'][$bundle]['form']['preview'] = [
       'label' => t('Preview'),
       'description' => t('Rendered preview'),
       'weight' => 50,
-    );
+    ];
   }
   return $fields;
 }
@@ -412,20 +412,20 @@ function contact_storage_mail_alter(&$message) {
  * Implements hook_theme().
  */
 function contact_storage_theme() {
-  return array(
-    'swiftmailer__contact' => array(
-      'variables' => array(
-        'message' => array(),
-      ),
-    ),
-    'contact_storage_disabled_form' => array(
+  return [
+    'swiftmailer__contact' => [
+      'variables' => [
+        'message' => [],
+      ],
+    ],
+    'contact_storage_disabled_form' => [
       'template' => 'contact-storage-disabled-form',
-      'variables' => array(
+      'variables' => [
         'contact_form' => NULL,
         'disabled_form_message' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**

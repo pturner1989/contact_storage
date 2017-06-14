@@ -18,18 +18,18 @@ class BulkFormTest extends ContactStorageTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  public static $modules = [
     'contact_storage',
     'contact_test_views',
     'language',
-  );
+  ];
 
   /**
    * Views used by this test.
    *
    * @var array
    */
-  public static $testViews = array('test_contact_message_bulk_form');
+  public static $testViews = ['test_contact_message_bulk_form'];
 
   /**
    * {@inheritdoc}
@@ -37,9 +37,9 @@ class BulkFormTest extends ContactStorageTestBase {
   protected function setUp() {
     parent::Setup();
     // Create and login administrative user.
-    $admin_user = $this->drupalCreateUser(array(
+    $admin_user = $this->drupalCreateUser([
       'administer contact forms',
-    ));
+    ]);
     $this->drupalLogin($admin_user);
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
@@ -48,7 +48,7 @@ class BulkFormTest extends ContactStorageTestBase {
     $this->drupalLogout();
 
     // Ensure that anonymous can submit site-wide contact form.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access site-wide contact form'));
+    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, ['access site-wide contact form']);
     $this->drupalGet('contact');
     $this->assertText(t('Your email address'));
     // Submit contact form few times.
@@ -63,9 +63,9 @@ class BulkFormTest extends ContactStorageTestBase {
    */
   public function testBulkDeletion() {
     $this->drupalGet('contact');
-    ViewTestData::createTestViews(get_class($this), array('contact_test_views'));
+    ViewTestData::createTestViews(get_class($this), ['contact_test_views']);
     // Check the operations are accessible to the administer permission user.
-    $this->drupalLogin($this->drupalCreateUser(array('administer contact forms')));
+    $this->drupalLogin($this->drupalCreateUser(['administer contact forms']));
     $this->drupalGet('test-contact-message-bulk-form');
     $elements = $this->xpath('//select[@id="edit-action"]//option');
     $this->assertIdentical(count($elements), 1, 'All contact message operations are found.');

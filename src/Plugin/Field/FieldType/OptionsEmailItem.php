@@ -26,7 +26,7 @@ class OptionsEmailItem extends ListItemBase {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
       ->setLabel(t('Text value'))
-      ->addConstraint('Length', array('max' => 255))
+      ->addConstraint('Length', ['max' => 255])
       ->setRequired(TRUE);
 
     return $properties;
@@ -36,17 +36,17 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
-    return array(
-      'columns' => array(
-        'value' => array(
+    return [
+      'columns' => [
+        'value' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-      ),
-      'indexes' => array(
-        'value' => array('value'),
-      ),
-    );
+        ],
+      ],
+      'indexes' => [
+        'value' => ['value'],
+      ],
+    ];
   }
 
   /**
@@ -58,7 +58,7 @@ class OptionsEmailItem extends ListItemBase {
     $description .= '<br/>' . t('"label" is the value displayed in the dropdown menu on the contact form.');
     $description .= '<br/>' . t('"emails" are the email addresses to add to the recipients list (each separated by a comma).');
     $description .= '</p>';
-    $description .= '<p>' . t('Allowed HTML tags in labels: @tags', array('@tags' => $this->displayAllowedTags())) . '</p>';
+    $description .= '<p>' . t('Allowed HTML tags in labels: @tags', ['@tags' => $this->displayAllowedTags()]) . '</p>';
     return $description;
   }
 
@@ -66,7 +66,7 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function extractAllowedValues($string, $has_data) {
-    $values = array();
+    $values = [];
 
     // Explode the content of the text area per line.
     $list = explode("\n", $string);
@@ -102,13 +102,13 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function simplifyAllowedValues(array $structured_values) {
-    $values = array();
+    $values = [];
 
     foreach ($structured_values as $value) {
-      $values[$value['key']] = array(
+      $values[$value['key']] = [
         'value' => $value['value'],
         'emails' => $value['emails'],
-      );
+      ];
     }
     return $values;
   }
@@ -117,14 +117,14 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function structureAllowedValues(array $values) {
-    $structured_values = array();
+    $structured_values = [];
 
     foreach ($values as $key => $value) {
-      $structured_values[] = array(
+      $structured_values[] = [
         'key' => $key,
         'value' => $value['value'],
         'emails' => $value['emails'],
-      );
+      ];
     }
     return $structured_values;
   }
@@ -157,7 +157,7 @@ class OptionsEmailItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected function allowedValuesString($values) {
-    $lines = array();
+    $lines = [];
     foreach ($values as $key => $value) {
       $lines[] = $key . '|' . $value['value'] . '|' . $value['emails'];
     }
