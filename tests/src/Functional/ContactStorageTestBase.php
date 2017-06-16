@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\contact_storage\Tests;
+namespace Drupal\Tests\contact_storage\Functional;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Defines a base-class for contact-storage tests.
  */
-abstract class ContactStorageTestBase extends WebTestBase {
+abstract class ContactStorageTestBase extends BrowserTestBase {
 
   /**
    * Adds a form.
@@ -33,7 +33,8 @@ abstract class ContactStorageTestBase extends WebTestBase {
     $edit['id'] = $id;
     // 8.2.x added the message field, which is by default empty. Conditionally
     // submit it if the field can be found.
-    if ($this->xpath($this->constructFieldXpath('name', 'message'))) {
+    $xpath = '//textarea[@name=:value]|//input[@name=:value]|//select[@name=:value]';
+    if ($this->xpath($this->buildXPathQuery($xpath, [':value' => 'message']))) {
       $edit['message'] = $message;
     }
     $edit['recipients'] = $recipients;

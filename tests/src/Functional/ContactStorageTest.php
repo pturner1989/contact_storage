@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\contact_storage\Tests;
+namespace Drupal\Tests\contact_storage\Functional;
 
 use Drupal\contact\Entity\ContactForm;
+use Drupal\Core\Test\AssertMailTrait;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\filter\Entity\FilterFormat;
@@ -15,6 +16,9 @@ use Drupal\filter\Entity\FilterFormat;
 class ContactStorageTest extends ContactStorageTestBase {
 
   use FieldUiTestTrait;
+  use AssertMailTrait {
+    getMails as drupalGetMails;
+  }
 
   /**
    * An administrative user with permission to administer contact forms.

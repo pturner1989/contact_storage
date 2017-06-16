@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\contact_storage\Tests;
+namespace Drupal\Tests\contact_storage\Functional;
 
 /**
  * Tests adding contact form as entity reference and viewing them through UI.

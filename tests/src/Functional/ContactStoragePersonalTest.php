@@ -1,19 +1,23 @@
 <?php
 
-namespace Drupal\contact_storage\Tests;
+namespace Drupal\Tests\contact_storage\Functional;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Core\Test\AssertMailTrait;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests personal contact form functionality.
  *
  * @group contact
  */
-class ContactStoragePersonalTest extends WebTestBase {
+class ContactStoragePersonalTest extends BrowserTestBase {
 
+  use AssertMailTrait {
+    getMails as drupalGetMails;
+  }
   /**
    * Modules to enable.
    *
