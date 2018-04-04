@@ -221,11 +221,6 @@ function contact_storage_entity_base_field_info(EntityTypeInterface $entity_type
       ->setLabel(t('Message ID'))
       ->setDescription(t('The message ID.'))
       ->setReadOnly(TRUE)
-      // Explicitly set this to 'contact' so that
-      // ContentEntityDatabaseStorage::usesDedicatedTable() doesn't attempt to
-      // put the ID in a dedicated table.
-      // @todo Remove when https://www.drupal.org/node/1498720 is in.
-      ->setProvider('contact')
       ->setSetting('unsigned', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
